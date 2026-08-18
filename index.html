@@ -610,6 +610,64 @@
       font-size: 12px
     }
 
+    .top-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      overflow: hidden;
+      z-index: 200;
+      display: none
+    }
+
+    .top-loader.active {
+      display: block
+    }
+
+    .top-loader::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 40%;
+      background: var(--blue2);
+      animation: loading-bar 1s ease-in-out infinite
+    }
+
+    @keyframes loading-bar {
+      0% {
+        transform: translateX(-100%)
+      }
+
+      100% {
+        transform: translateX(250%)
+      }
+    }
+
+    .spinner {
+      display: none;
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(29, 93, 155, .25);
+      border-top-color: var(--blue2);
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: -2px;
+      animation: spin .7s linear infinite
+    }
+
+    .spinner.active {
+      display: inline-block
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
     @media(max-width:700px) {
       .header {
         position: relative;
@@ -842,6 +900,7 @@
 </head>
 
 <body>
+  <div class="top-loader" id="topLoader"></div>
   <header class="header">
     <div class="header-inner">
       <div>
@@ -891,7 +950,7 @@
         <option value="visited">Visited</option>
         <option value="notVisited">Not Visited</option>
       </select>
-      <span class="save-status" id="saveStatus">Connecting...</span>
+      <span class="save-status" id="saveStatus"><span class="spinner" id="syncSpinner"></span><span id="saveStatusText">Connecting...</span></span>
     </div>
 
     <div id="daysContainer"></div>
@@ -1033,6 +1092,15 @@
         ]
       }];
 
+    const ORIGINAL_COSTS = (() => {
+      const map = {};
+      INITIAL_DAYS.forEach(day => day.places.forEach(p => {
+        const costs = {}; PEOPLE.forEach((person, i) => costs[person.id] = Number(p[i + 2] || 0));
+        map[p[0]] = costs;
+      }));
+      return map;
+    })();
+
     let data = null;
     let syncing = false;
     let dayFilterAutoApplied = false;
@@ -1080,7 +1148,16 @@
     }
 
     function setStatus(text, color) {
-      const el = document.getElementById("saveStatus"); if (el) { el.textContent = text; el.style.color = color || "var(--green)" }
+      const wrap = document.getElementById("saveStatus"), textEl = document.getElementById("saveStatusText");
+      if (textEl) textEl.textContent = text; if (wrap) wrap.style.color = color || "var(--green)";
+    }
+
+    let busyCount = 0;
+    function setBusy(active) {
+      busyCount = Math.max(0, busyCount + (active ? 1 : -1));
+      const busy = busyCount > 0;
+      const loader = document.getElementById("topLoader"); if (loader) loader.classList.toggle("active", busy);
+      const spinner = document.getElementById("syncSpinner"); if (spinner) spinner.classList.toggle("active", busy);
     }
 
     /* JSONP is used intentionally: Google Apps Script Web Apps can be called
@@ -1092,10 +1169,11 @@
           return;
         }
         if (showSaving) setStatus("Syncing...", "var(--orange)");
+        setBusy(true);
         const cb = "jsonp_" + Date.now() + "_" + Math.random().toString(36).slice(2);
         const script = document.createElement("script");
         let done = false;
-        const cleanup = () => { done = true; script.remove(); try { delete window[cb] } catch (e) { } };
+        const cleanup = () => { done = true; setBusy(false); script.remove(); try { delete window[cb] } catch (e) { } };
         const timer = setTimeout(() => { cleanup(); reject(new Error("Cloud sync timed out.")) }, 20000);
         window[cb] = (result) => { clearTimeout(timer); cleanup(); if (result && result.ok) resolve(result); else reject(new Error(result?.error || "Cloud error")) };
         const params = new URLSearchParams({ action, callback: cb });
@@ -1154,6 +1232,13 @@
     }
     async function cloudReset() {
       try { await apiCall("reset", {}); await uploadAllInitialData(); } catch (e) { console.error(e); setStatus("Reset locally; cloud reset failed", "var(--red)") }
+    }
+    async function cloudSaveAllPlaces() {
+      try {
+        setStatus("Saving reset...", "var(--orange)");
+        for (const day of data.days) for (const place of day.places) await apiCall("savePlace", { dayId: day.id, dayName: day.name, place }, false);
+        setStatus("Cloud synced", "var(--green)");
+      } catch (e) { console.error(e); setStatus("Reset locally; cloud save failed", "var(--red)") }
     }
 
     function getPlaceTotal(place) { return PEOPLE.reduce((t, p) => t + Number(place.costs[p.id] || 0), 0) }
@@ -1290,9 +1375,14 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
       }; reader.readAsText(file);
     }
     async function resetTrip() {
-      if (!confirm("Reset the entire trip?\n\nAll added sightseeing, edited costs, visited statuses and payment information will be removed.")) return;
-      if (!confirm("FINAL CONFIRMATION\n\nRestore the current original itinerary and original ticket amounts?")) return;
-      data = makeInitialData(); render(); await cloudReset(); alert("Trip has been reset successfully.");
+      if (!confirm("Reset payment data?\n\nAll costs and Paid By selections will be reset to their default values. Sightseeing locations, days, names and visited status will NOT be changed.")) return;
+      if (!confirm("FINAL CONFIRMATION\n\nReset all costs and Paid By selections to their default values?")) return;
+      data.days.forEach(day => day.places.forEach(place => {
+        const original = ORIGINAL_COSTS[place.sourceKey];
+        PEOPLE.forEach(p => place.costs[p.id] = original ? Number(original[p.id] || 0) : 0);
+        place.paidBy = "Not Paid";
+      }));
+      render(); await cloudSaveAllPlaces(); alert("Payment data has been reset successfully.");
     }
     function closeModal() { document.getElementById("modalBackdrop").classList.remove("open") }
     document.getElementById("modalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal() });
