@@ -52,11 +52,23 @@
       border-radius: 7px;
       padding: 9px 13px;
       background: #e8edf3;
-      color: #243447
+      color: #243447;
+      font-weight: 600;
+      transition: filter .12s ease, transform .08s ease, opacity .12s ease
     }
 
     button:hover {
       filter: brightness(.96)
+    }
+
+    button:active {
+      transform: scale(.97)
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .55;
+      transform: none
     }
 
     .btn-primary {
@@ -81,7 +93,8 @@
 
     .app-navbar {
       padding: 12px 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+      background: linear-gradient(135deg, var(--blue), var(--blue2)) !important;
+      box-shadow: 0 2px 10px rgba(16, 24, 40, .18);
       z-index: 50
     }
 
@@ -91,30 +104,149 @@
 
     .app-brand {
       font-size: 21px;
-      font-weight: bold
+      font-weight: bold;
+      letter-spacing: .2px
     }
 
-    @media (prefers-color-scheme: dark) {
-      .app-navbar {
-        background-color: #212529 !important
-      }
+    .app-navbar .nav-link {
+      font-weight: 500;
+      border-radius: 6px;
+      padding: 8px 12px !important;
+      transition: background .15s ease, color .15s ease
+    }
 
-      .app-navbar .navbar-brand,
-      .app-navbar .nav-link {
-        color: rgba(255, 255, 255, .85) !important
-      }
+    .app-navbar .nav-link:hover,
+    .app-navbar .nav-link:focus {
+      background: rgba(255, 255, 255, .12);
+      color: #fff !important
+    }
 
-      .app-navbar .nav-link:hover,
-      .app-navbar .nav-link:focus {
-        color: #fff !important
-      }
+    .app-navbar .nav-link.text-danger:hover {
+      background: rgba(255, 99, 99, .18)
+    }
 
-      .app-navbar .navbar-toggler {
-        border-color: rgba(255, 255, 255, .4)
-      }
+    .navbar-top-row {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
 
-      .app-navbar .navbar-toggler-icon {
-        filter: invert(1) grayscale(100)
+    @media (max-width: 991.98px) {
+      .navbar-top-row {
+        width: 100%
+      }
+    }
+
+    .theme-picker {
+      position: relative;
+      margin-left: auto;
+      z-index: 60
+    }
+
+    .theme-picker-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .16);
+      border: 1px solid rgba(255, 255, 255, .28);
+      color: #fff;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s ease
+    }
+
+    .theme-picker-btn:hover {
+      background: rgba(255, 255, 255, .3)
+    }
+
+    .theme-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 216px;
+      max-width: calc(100vw - 24px);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(16, 24, 40, .2);
+      padding: 8px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity .15s ease, transform .15s ease;
+      z-index: 61
+    }
+
+    .theme-picker.open .theme-menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0)
+    }
+
+    .theme-menu-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      color: var(--muted);
+      padding: 6px 8px 8px
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      background: transparent;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left
+    }
+
+    .theme-option:hover {
+      background: #f1f4f8
+    }
+
+    .theme-option.active {
+      background: #eef4fb
+    }
+
+    .theme-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(0, 0, 0, .1)
+    }
+
+    .theme-option-name {
+      flex: 1
+    }
+
+    .theme-check {
+      opacity: 0;
+      color: var(--blue2);
+      font-weight: bold;
+      font-size: 14px
+    }
+
+    .theme-option.active .theme-check {
+      opacity: 1
+    }
+
+    @media (min-width: 992px) {
+      .theme-picker-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px
       }
     }
 
@@ -134,15 +266,22 @@
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 9px;
+      border-radius: 12px;
       box-shadow: var(--shadow);
-      padding: 16px
+      padding: 16px;
+      transition: box-shadow .15s ease, transform .15s ease
+    }
+
+    .summary-grid .card:hover {
+      box-shadow: 0 6px 18px rgba(16, 24, 40, .12);
+      transform: translateY(-2px)
     }
 
     .total-card {
-      background: var(--blue);
+      background: linear-gradient(135deg, var(--blue), var(--blue2));
       color: #fff;
-      grid-column: span 2
+      grid-column: span 2;
+      border-color: transparent
     }
 
     .total-card .label {
@@ -177,22 +316,36 @@
 
     .view-tabs {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap
+      gap: 4px;
+      flex-wrap: wrap;
+      background: #e8edf3;
+      padding: 4px;
+      border-radius: 11px
     }
 
     .view-tab {
-      background: #fff;
-      border: 1px solid var(--border);
+      background: transparent;
+      border: none;
       color: var(--muted);
       font-weight: bold;
-      padding: 9px 16px
+      font-size: 14px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      transition: background .15s ease, color .15s ease, box-shadow .15s ease
+    }
+
+    .view-tab:hover {
+      color: var(--blue2)
     }
 
     .view-tab.active {
-      background: var(--blue2);
-      color: #fff;
-      border-color: var(--blue2)
+      background: #fff;
+      color: var(--blue2);
+      box-shadow: 0 2px 6px rgba(16, 24, 40, .14)
+    }
+
+    .view-tab.active:hover {
+      color: var(--blue2)
     }
 
     .toolbar {
@@ -208,28 +361,34 @@
       min-width: 180px;
       padding: 9px 11px;
       border: 1px solid var(--border);
-      border-radius: 7px;
-      background: #fff
+      border-radius: 8px;
+      background: #fff;
+      transition: border-color .15s ease, box-shadow .15s ease
     }
 
-    .save-status {
-      margin-left: auto;
-      color: var(--green);
-      font-size: 13px;
-      font-weight: bold
+    .toolbar input:hover,
+    .toolbar select:hover {
+      border-color: #b7c3d1
+    }
+
+    .toolbar input:focus,
+    .toolbar select:focus {
+      outline: none;
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(18, 108, 191, .15)
     }
 
     .day-card {
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 9px;
+      border-radius: 12px;
       box-shadow: var(--shadow);
       margin-bottom: 20px;
       overflow: hidden
     }
 
     .day-header {
-      background: #f8fafc;
+      background: linear-gradient(135deg, #eef4fb, #f8fafc);
       padding: 13px 16px;
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -316,6 +475,16 @@
       background: #edf3f8
     }
 
+    tbody tr {
+      transition: background .1s ease
+    }
+
+    tbody tr:hover td,
+    tbody tr:hover td:first-child,
+    tbody tr:hover td:last-child {
+      background: #f3f7fb
+    }
+
     .cost-input {
       width: 78px;
       padding: 6px;
@@ -363,24 +532,6 @@
       margin-left: 5px
     }
 
-    .status-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: bold;
-      padding: 3px 8px;
-      border-radius: 10px
-    }
-
-    .status-badge.status-paid {
-      background: #d1fae5;
-      color: #065f46
-    }
-
-    .status-badge.status-pending {
-      background: #fef3c7;
-      color: #92400e
-    }
-
     .food-tracker-heading {
       font-size: 15px;
       font-weight: bold;
@@ -392,6 +543,32 @@
       font-weight: normal;
       color: var(--muted);
       font-size: 13px
+    }
+
+    .fab-add-bill {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      font-size: 30px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(16, 24, 40, .25);
+      cursor: pointer;
+      z-index: 90;
+      transition: transform .15s ease, background .15s ease
+    }
+
+    .fab-add-bill:hover {
+      background: var(--blue);
+      transform: scale(1.06)
     }
 
     .empty {
@@ -407,9 +584,10 @@
     .mobile-place {
       margin: 8px 10px;
       border: 1px solid var(--border);
-      border-radius: 9px;
+      border-radius: 11px;
       overflow: hidden;
-      background: #fff
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(16, 24, 40, .06)
     }
 
     .mobile-place.visited {
@@ -527,7 +705,7 @@
     .detail-section {
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 9px;
+      border-radius: 12px;
       box-shadow: var(--shadow);
       margin: 16px 0;
       overflow: hidden
@@ -584,25 +762,6 @@
       font-size: 18px
     }
 
-    .family-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px
-    }
-
-    .family-person {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 7px 10px;
-      font-size: 13px
-    }
-
-    .child-tag {
-      color: #7c3aed;
-      font-size: 11px
-    }
-
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -624,7 +783,7 @@
       max-height: 92vh;
       overflow: auto;
       background: #fff;
-      border-radius: 10px;
+      border-radius: 14px;
       box-shadow: 0 15px 50px rgba(0, 0, 0, .25)
     }
 
@@ -665,9 +824,21 @@
 
     .field input,
     .field select {
-      padding: 9px;
+      padding: 10px;
       border: 1px solid #cbd5e1;
-      border-radius: 6px
+      border-radius: 6px;
+      width: 100%;
+      font-size: 15px;
+      background: #fff;
+      color: var(--text);
+      transition: border-color .15s ease, box-shadow .15s ease
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(18, 108, 191, .15)
     }
 
     .modal-footer {
@@ -681,7 +852,46 @@
     .close-btn {
       background: transparent;
       font-size: 20px;
-      padding: 2px 7px
+      padding: 6px 11px;
+      border-radius: 6px;
+      line-height: 1
+    }
+
+    .close-btn:hover {
+      background: #eef2f7
+    }
+
+    .share-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .share-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: left;
+      text-decoration: none;
+      transition: background .15s ease, border-color .15s ease
+    }
+
+    .share-option:hover {
+      background: #eef4fb;
+      border-color: var(--blue2)
+    }
+
+    .share-icon {
+      font-size: 19px;
+      flex-shrink: 0
     }
 
     .status-note {
@@ -696,8 +906,11 @@
     .footer {
       text-align: center;
       padding: 25px;
+      margin-top: 10px;
+      border-top: 1px solid var(--border);
       color: var(--muted);
-      font-size: 12px
+      font-size: 12px;
+      line-height: 1.7
     }
 
     .top-loader {
@@ -752,6 +965,60 @@
       display: inline-block
     }
 
+    .status-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translate(-50%, 14px);
+      background: #1f2937;
+      color: #fff;
+      padding: 11px 20px;
+      border-radius: 999px;
+      box-shadow: 0 10px 28px rgba(16, 24, 40, .35);
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: calc(100vw - 32px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: 300;
+      transition: opacity .25s ease, transform .25s ease, visibility .25s
+    }
+
+    .status-toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, 0)
+    }
+
+    .status-toast .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--green)
+    }
+
+    .status-toast .spinner {
+      margin-right: 0;
+      border-color: rgba(255, 255, 255, .3);
+      border-top-color: #fff
+    }
+
+    @media (max-width: 700px) {
+      .status-toast {
+        bottom: 18px;
+        font-size: 12.5px;
+        padding: 10px 16px
+      }
+    }
+
     .sync-overlay {
       position: fixed;
       inset: 0;
@@ -789,6 +1056,16 @@
     }
 
     @media(max-width:700px) {
+      .view-tabs {
+        width: 100%
+      }
+
+      .view-tab {
+        flex: 1;
+        padding: 9px 10px;
+        font-size: 13px
+      }
+
       .app-navbar {
         padding: 10px 12px
       }
@@ -839,12 +1116,6 @@
 
       .toolbar input {
         grid-column: 1/-1
-      }
-
-      .save-status {
-        grid-column: 1/-1;
-        margin: 0;
-        text-align: right
       }
 
       .day-card {
@@ -948,9 +1219,13 @@
         gap: 8px
       }
 
-      .field:first-child,
-      .field:nth-child(2) {
+      #modalBackdrop .field:first-child,
+      #modalBackdrop .field:nth-child(2) {
         grid-column: 1/-1
+      }
+
+      #foodModalBackdrop .form-grid {
+        grid-template-columns: 1fr
       }
 
       .modal-footer {
@@ -989,30 +1264,62 @@
       }
     }
   </style>
+  <script>
+    const THEMES = [
+      { id: "classic-blue", name: "Classic Blue", colors: ["#123b68", "#1d5d9b"], vars: { "--blue": "#123b68", "--blue2": "#1d5d9b", "--bg": "#f1f4f8", "--green": "#16834b", "--green-bg": "#e8f7ef", "--red": "#c62828", "--orange": "#b86b00" } },
+      { id: "forest-green", name: "Forest Green", colors: ["#14532d", "#2f855a"], vars: { "--blue": "#14532d", "--blue2": "#2f855a", "--bg": "#f1f7f3", "--green": "#16834b", "--green-bg": "#e8f7ef", "--red": "#c62828", "--orange": "#b86b00" } },
+      { id: "ocean-teal", name: "Ocean Teal", colors: ["#115e59", "#0d9488"], vars: { "--blue": "#115e59", "--blue2": "#0d9488", "--bg": "#eef7f7", "--green": "#16834b", "--green-bg": "#e8f7ef", "--red": "#c62828", "--orange": "#b86b00" } },
+      { id: "burnt-orange", name: "Burnt Orange", colors: ["#7c2d12", "#c2410c"], vars: { "--blue": "#7c2d12", "--blue2": "#c2410c", "--bg": "#faf3ee", "--green": "#16834b", "--green-bg": "#e8f7ef", "--red": "#c62828", "--orange": "#b86b00" } },
+      { id: "sunset-amber", name: "Sunset Amber", colors: ["#78350f", "#d97706"], vars: { "--blue": "#78350f", "--blue2": "#d97706", "--bg": "#fdf6ec", "--green": "#16834b", "--green-bg": "#e8f7ef", "--red": "#c62828", "--orange": "#b86b00" } },
+      { id: "royal-purple", name: "Royal Purple", colors: ["#4c1d95", "#7c3aed"], vars: { "--blue": "#4c1d95", "--blue2": "#7c3aed", "--bg": "#f5f2fb", "--green": "#16834b", "--green-bg": "#e8f7ef", "--red": "#c62828", "--orange": "#b86b00" } },
+      { id: "black-white", name: "Black & White", colors: ["#111827", "#4b5563"], vars: { "--blue": "#111827", "--blue2": "#4b5563", "--bg": "#f4f4f5", "--green": "#374151", "--green-bg": "#f3f4f6", "--red": "#111827", "--orange": "#6b7280" } }
+    ];
+    function getSavedThemeId() {
+      try { return localStorage.getItem("rtt_theme") } catch (e) { return null }
+    }
+    function applyTheme(themeId) {
+      const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
+      const root = document.documentElement.style;
+      Object.keys(theme.vars).forEach(k => root.setProperty(k, theme.vars[k]));
+      try { localStorage.setItem("rtt_theme", theme.id) } catch (e) { }
+      document.querySelectorAll(".theme-option").forEach(btn => {
+        const active = btn.dataset.theme === theme.id;
+        btn.classList.toggle("active", active);
+        btn.setAttribute("aria-checked", String(active));
+      });
+    }
+    (function () {
+      const saved = getSavedThemeId();
+      if (saved && THEMES.some(t => t.id === saved)) applyTheme(saved);
+    })();
+  </script>
 </head>
 
 <body>
   <div class="top-loader" id="topLoader"></div>
   <div class="sync-overlay" id="syncOverlay"><div class="sync-overlay-circle"></div></div>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light app-navbar sticky-top">
+  <div class="status-toast" id="statusToast"><span class="status-dot" id="statusDot"></span><span class="spinner" id="syncSpinner"></span><span id="statusToastText"></span></div>
+  <nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
     <div class="container-fluid">
-      <a class="navbar-brand app-brand" href="#">🏰 Trip Tracker</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#appNavMenu" aria-controls="appNavMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      <div class="navbar-top-row">
+        <a class="navbar-brand app-brand" href="#">🏰 Trip Tracker</a>
+        <div class="theme-picker" id="themePicker">
+          <button type="button" class="theme-picker-btn" id="themePickerBtn" onclick="toggleThemeMenu(event)" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false">🎨</button>
+          <div class="theme-menu" id="themeMenu" role="menu" aria-hidden="true"></div>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#appNavMenu" aria-controls="appNavMenu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
       <div class="collapse navbar-collapse" id="appNavMenu">
         <ul class="navbar-nav">
           <li class="nav-item"><a class="nav-link" href="#" onclick="openAddSightseeing();return false">Add Sightseeing</a></li>
-          <li class="nav-item"><a class="nav-link" href="#" onclick="openAddFoodBill();return false">Add Food Bill</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="addDay();return false">Add Day</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="refreshFromCloud();return false">Refresh</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="viewGoogleSheet();return false">View Google Sheet</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="shareGoogleSheet();return false">Share Sheet Link</a></li>
-          <li class="nav-item"><a class="nav-link" href="#" onclick="exportData();return false">Export Backup</a></li>
-          <li class="nav-item"><a class="nav-link" href="#" onclick="document.getElementById('importFile').click();return false">Import Backup</a></li>
           <li class="nav-item"><a class="nav-link text-danger" href="#" onclick="resetTrip();return false">Reset Trip</a></li>
         </ul>
-        <input type="file" id="importFile" accept=".json,application/json" hidden onchange="importData(event)">
       </div>
     </div>
   </nav>
@@ -1023,25 +1330,24 @@
         <button type="button" class="view-tab active" id="tabBtnSightseeing" onclick="switchTab('sightseeing')">🏰 Sightseeing</button>
         <button type="button" class="view-tab" id="tabBtnFood" onclick="switchTab('food')">🍽️ Food Bill</button>
       </div>
-      <span class="save-status" id="saveStatus"><span class="spinner" id="syncSpinner"></span><span id="saveStatusText">Connecting...</span></span>
     </div>
 
     <div id="sightseeingView">
       <section class="summary-grid">
         <div class="card total-card">
-          <div class="label">Total Trip Sightseeing Cost</div>
+          <div class="label">💰 Total Trip Sightseeing Cost</div>
           <div class="value" id="overallTotal">₹0</div>
         </div>
         <div class="card">
-          <div class="label">Locations</div>
+          <div class="label">📍 Locations</div>
           <div class="value" id="locationCount">0</div>
         </div>
         <div class="card">
-          <div class="label">Visited</div>
+          <div class="label">✅ Visited</div>
           <div class="value" id="visitedCount">0</div>
         </div>
         <div class="card">
-          <div class="label">Average / Person</div>
+          <div class="label">👤 Average / Person</div>
           <div class="value" id="averagePersonCost">₹0</div>
         </div>
       </section>
@@ -1064,16 +1370,6 @@
         <summary><span class="ds-icon">👥</span> Person-wise Totals</summary>
         <div class="ds-body">
           <section class="person-grid" id="personTotals"></section>
-        </div>
-      </details>
-
-      <details class="detail-section">
-        <summary><span class="ds-icon">👪</span> Family Relationship</summary>
-        <div class="ds-body">
-          <div class="family-row">
-            <div class="family-person">Rahul</div>
-            <div class="family-person">Dhara</div>
-          </div>
         </div>
       </details>
 
@@ -1118,17 +1414,18 @@
 
     <div id="foodView" style="display:none">
       <div class="food-tracker-heading">🍽️ Food Bill Tracker <span>· managed by Parul</span></div>
+      <button type="button" class="fab-add-bill" id="foodFab" onclick="openAddFoodBill()" title="Add Food Bill" aria-label="Add Food Bill">+</button>
       <section class="summary-grid">
         <div class="card total-card">
-          <div class="label">Total Food Bill Cost</div>
+          <div class="label">💰 Total Food Bill Cost</div>
           <div class="value" id="foodOverallTotal">₹0</div>
         </div>
         <div class="card">
-          <div class="label">Food Bills</div>
+          <div class="label">🧾 Food Bills</div>
           <div class="value" id="foodBillCount">0</div>
         </div>
         <div class="card">
-          <div class="label">Average / Bill</div>
+          <div class="label">📊 Average / Bill</div>
           <div class="value" id="foodAverageBill">₹0</div>
         </div>
       </section>
@@ -1137,11 +1434,6 @@
         <input id="foodSearchInput" type="search" placeholder="Search restaurant, food, notes..." oninput="render()">
         <select id="foodDayFilter" onchange="render()">
           <option value="all">All Days</option>
-        </select>
-        <select id="foodStatusFilter" onchange="render()">
-          <option value="all">All Status</option>
-          <option value="paid">Paid</option>
-          <option value="pending">Pending</option>
         </select>
       </div>
 
@@ -1220,15 +1512,15 @@
   <div class="modal-backdrop" id="foodModalBackdrop">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 id="foodModalTitle">Add Food Bill</h3><button class="close-btn" onclick="closeFoodModal()">×</button>
+        <h3 id="foodModalTitle">🍽️ Add Food Bill</h3><button class="close-btn" onclick="closeFoodModal()">×</button>
       </div>
       <div class="modal-body">
         <form id="foodBillForm">
           <div class="form-grid">
-            <div class="field"><label>Day</label><select id="foodFormDay" required></select></div>
-            <div class="field"><label>Date</label><input id="foodFormDate" type="date"></div>
-            <div class="field"><label>Restaurant / Shop</label><input id="foodFormRestaurant" required
+            <div class="field" style="grid-column:1/-1"><label>Restaurant / Shop</label><input id="foodFormRestaurant" required
                 placeholder="e.g. Local Dhaba"></div>
+            <select id="foodFormDay" style="display:none"></select>
+            <div class="field"><label>Date</label><input id="foodFormDate" type="date"></div>
             <div class="field"><label>Food</label><input id="foodFormFood" placeholder="e.g. Thali, Lassi"></div>
             <div class="field"><label>Category</label>
               <select id="foodFormCategory">
@@ -1239,20 +1531,29 @@
                 <option value="other">Other</option>
               </select>
             </div>
-            <div class="field"><label>Amount</label><input id="foodFormAmount" type="number" min="0" value="0"></div>
+            <div class="field"><label>Amount (₹)</label><input id="foodFormAmount" type="number" min="0" value="0" inputmode="decimal"></div>
             <div class="field"><label>Paid By</label><select id="foodFormPaidBy"></select></div>
-            <div class="field"><label>Payment Status</label>
-              <select id="foodFormStatus">
-                <option value="paid" selected>Paid</option>
-                <option value="pending">Pending</option>
-              </select>
-            </div>
             <div class="field" style="grid-column:1/-1"><label>Notes</label><input id="foodFormNotes" placeholder="Optional notes"></div>
           </div>
         </form>
       </div>
       <div class="modal-footer"><button onclick="closeFoodModal()">Cancel</button><button class="btn-primary"
           onclick="saveFoodBill()" id="foodFormSaveBtn">Save Food Bill</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="shareModalBackdrop">
+    <div class="modal-box" style="width:min(360px,100%)">
+      <div class="modal-header">
+        <h3>📤 Share Trip Sheet</h3><button class="close-btn" onclick="closeShareModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="share-options">
+          <a class="share-option" href="#" onclick="shareVia('whatsapp');return false"><span class="share-icon">🟢</span><span>WhatsApp</span></a>
+          <a class="share-option" href="#" onclick="shareVia('email');return false"><span class="share-icon">✉️</span><span>Email</span></a>
+          <button type="button" class="share-option" onclick="shareVia('copy')"><span class="share-icon">🔗</span><span>Copy Link</span></button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1342,6 +1643,7 @@
       document.getElementById("foodView").style.display = tab === "food" ? "" : "none";
       document.getElementById("tabBtnSightseeing").classList.toggle("active", tab === "sightseeing");
       document.getElementById("tabBtnFood").classList.toggle("active", tab === "food");
+      try { localStorage.setItem("rtt_activeTab", tab) } catch (e) { }
     }
 
     const TRIP_START_DATE = new Date(2026, 7, 29); // 29 Aug 2026 = Day 1
@@ -1374,9 +1676,12 @@
       const pad = n => String(n).padStart(2, "0");
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     }
+    function todayDateString() {
+      const d = new Date(), pad = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
 
     const FOOD_CATEGORIES = { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner", snacks: "Snacks", other: "Other" };
-    const FOOD_STATUSES = { paid: "Paid", pending: "Pending" };
 
     function makeInitialData() {
       return {
@@ -1423,7 +1728,7 @@
           bill.amount = Math.max(0, Number(bill.amount) || 0);
           if (!PEOPLE.some(p => p.id === bill.paidBy)) bill.paidBy = "parul";
           if (!FOOD_CATEGORIES[bill.category]) bill.category = "lunch";
-          if (!FOOD_STATUSES[bill.paymentStatus]) bill.paymentStatus = "paid";
+          delete bill.paymentStatus;
           bill.notes = String(bill.notes || "");
           delete bill.name;
         });
@@ -1432,9 +1737,16 @@
       return addedDays;
     }
 
+    let statusHideTimer = null;
     function setStatus(text, color) {
-      const wrap = document.getElementById("saveStatus"), textEl = document.getElementById("saveStatusText");
-      if (textEl) textEl.textContent = text; if (wrap) wrap.style.color = color || "var(--green)";
+      const toast = document.getElementById("statusToast"), textEl = document.getElementById("statusToastText"), dot = document.getElementById("statusDot");
+      if (!toast || !textEl) return;
+      textEl.textContent = text;
+      dot.style.background = color || "var(--green)";
+      toast.classList.add("show");
+      clearTimeout(statusHideTimer);
+      const duration = color === "var(--red)" ? 4500 : 2600;
+      statusHideTimer = setTimeout(() => toast.classList.remove("show"), duration);
     }
 
     let busyCount = 0;
@@ -1483,8 +1795,21 @@
       if (navigator.share) {
         try { await navigator.share({ title: "Rajasthan Trip Expense Sheet", url: SHEET_URL }); return } catch (err) { if (err.name === "AbortError") return }
       }
-      try { await navigator.clipboard.writeText(SHEET_URL); alert("Google Sheet link copied to clipboard!") }
-      catch (err) { prompt("Copy this Google Sheet link:", SHEET_URL) }
+      openShareModal();
+    }
+    function openShareModal() { document.getElementById("shareModalBackdrop").classList.add("open") }
+    function closeShareModal() { document.getElementById("shareModalBackdrop").classList.remove("open") }
+    async function shareVia(target) {
+      const text = "Rajasthan Trip Expense Sheet: " + SHEET_URL;
+      if (target === "whatsapp") window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
+      else if (target === "email") window.location.href = "mailto:?subject=" + encodeURIComponent("Rajasthan Trip Expense Sheet") + "&body=" + encodeURIComponent(text);
+      else if (target === "copy") {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          try { await navigator.clipboard.writeText(SHEET_URL); setStatus("Google Sheet link copied to clipboard!", "var(--green)") }
+          catch (err) { prompt("Copy this link:", SHEET_URL) }
+        } else prompt("Copy this link:", SHEET_URL);
+      }
+      closeShareModal();
     }
 
     async function refreshFromCloud() {
@@ -1556,9 +1881,9 @@
     }
 
     function getPlaceTotal(place) { return PEOPLE.reduce((t, p) => t + Number(place.costs[p.id] || 0), 0) }
-    function getDayTotals(day) {
+    function getDayTotals(day, places) {
       const totals = {}; PEOPLE.forEach(p => totals[p.id] = 0);
-      day.places.forEach(place => PEOPLE.forEach(p => totals[p.id] += Number(place.costs[p.id] || 0)));
+      (places || day.places).forEach(place => PEOPLE.forEach(p => totals[p.id] += Number(place.costs[p.id] || 0)));
       totals.overall = PEOPLE.reduce((s, p) => s + totals[p.id], 0); return totals;
     }
     function calculateTotals() {
@@ -1615,20 +1940,20 @@
       data.days.forEach(day => {
         if (dayFilter !== "all" && day.id !== dayFilter) return;
         const places = day.places.filter(p => (!search || p.name.toLowerCase().includes(search)) && (visitedFilter === "all" || (visitedFilter === "visited" && p.visited) || (visitedFilter === "notVisited" && !p.visited)));
-        const totals = getDayTotals(day);
+        if (!places.length) return;
+        const totals = getDayTotals(day, places);
         html += `<section class="day-card"><div class="day-header"><h2>${escapeHtml(day.name)}${day.id === todayDayId ? '<span class="today-badge">Today</span>' : ""}</h2><div class="day-total">${currency(totals.overall)}</div></div>`;
-        if (places.length) html += `<div class="table-wrap"><table><thead><tr><th>Sightseeing</th>${PEOPLE.map(p => `<th>${escapeHtml(p.name)}</th>`).join("")}<th>Total</th><th>Actions</th></tr></thead><tbody>${places.map(p => renderDesktopPlace(day, p)).join("")}</tbody><tfoot><tr><th>Day Total</th>${PEOPLE.map(p => `<th>${currency(totals[p.id])}</th>`).join("")}<th>${currency(totals.overall)}</th><th></th></tr></tfoot></table></div>`;
-        else html += `<div class="empty">No sightseeing matches the current filter.</div>`;
-        html += `<div class="mobile-places">${places.length ? places.map(p => renderMobilePlace(day, p)).join("") : `<div class="empty">No sightseeing matches the current filter.</div>`}</div><div class="mobile-day-total"><div class="mobile-day-total-box"><span class="small-label">Places</span><strong>${places.length}</strong></div><div class="mobile-day-total-box"><span class="small-label">Day Total</span><strong>${currency(totals.overall)}</strong></div></div></section>`;
+        html += `<div class="table-wrap"><table><thead><tr><th>Sightseeing</th>${PEOPLE.map(p => `<th>${escapeHtml(p.name)}</th>`).join("")}<th>Total</th><th>Actions</th></tr></thead><tbody>${places.map(p => renderDesktopPlace(day, p)).join("")}</tbody><tfoot><tr><th>Day Total</th>${PEOPLE.map(p => `<th>${currency(totals[p.id])}</th>`).join("")}<th>${currency(totals.overall)}</th><th></th></tr></tfoot></table></div>`;
+        html += `<div class="mobile-places">${places.map(p => renderMobilePlace(day, p)).join("")}</div><div class="mobile-day-total"><div class="mobile-day-total-box"><span class="small-label">Places</span><strong>${places.length}</strong></div><div class="mobile-day-total-box"><span class="small-label">Day Total</span><strong>${currency(totals.overall)}</strong></div></div></section>`;
       });
-      container.innerHTML = html || '<div class="card empty">No days found.</div>';
+      container.innerHTML = html || '<div class="card empty">No sightseeing found.</div>';
     }
     function renderDesktopPlace(day, place) {
       const locked = place.visited || loadingCloud;
       return `<tr class="${place.visited ? "visited-row" : ""}"><td><input class="name-input" value="${escapeHtml(place.name)}" onchange="renameSightseeing('${day.id}','${place.id}',this.value)" ${locked ? "disabled" : ""}>${place.visited ? '<span class="visited-badge">✓ Visited</span>' : ""}</td>
 ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)" ${locked ? "disabled" : ""}></td>`).join("")}
 <td class="total-cell">${currency(getPlaceTotal(place))}</td>
-<td><div class="actions"><button class="${place.visited ? "btn-green" : ""} btn-small" onclick="toggleVisited('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>${place.visited ? "✓ Visited" : "Visited"}</button><button class="btn-danger btn-small" onclick="deleteSightseeing('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>Delete</button></div></td></tr>`;
+<td><div class="actions"><button class="btn-primary btn-small" onclick="saveCosts('${day.id}','${place.id}')" ${locked ? "disabled" : ""}>Update</button><button class="${place.visited ? "btn-green" : ""} btn-small" onclick="toggleVisited('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>${place.visited ? "✓ Visited" : "Visited"}</button><button class="btn-danger btn-small" onclick="deleteSightseeing('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>Delete</button></div></td></tr>`;
     }
     function renderMobilePlace(day, place) {
       const expanded = expandedPlaces.has(place.id), locked = place.visited || loadingCloud;
@@ -1641,13 +1966,17 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
 </div>
 <div class="collapse ${expanded ? "show" : ""}" id="mp-${place.id}">
 <div class="mobile-cost-section"><div class="mobile-section-label">Ticket Cost</div><div class="mobile-cost-grid">${PEOPLE.map(p => `<div class="mobile-cost-field"><label>${escapeHtml(p.name)}</label><input class="mobile-cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)" ${locked ? "disabled" : ""}></div>`).join("")}</div></div>
-<div class="mobile-actions"><button class="btn-danger" onclick="deleteSightseeing('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>Delete Sightseeing</button></div>
+<div class="mobile-actions"><button class="btn-primary" onclick="saveCosts('${day.id}','${place.id}')" ${locked ? "disabled" : ""}>Update Amount</button><button class="btn-danger" onclick="deleteSightseeing('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>Delete Sightseeing</button></div>
 </div>
 </div>`;
     }
-    async function updateCost(dayId, placeId, personId, value) {
+    function updateCost(dayId, placeId, personId, value) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
-      place.costs[personId] = Math.max(0, Number(value) || 0); render(); await cloudSavePlace(day, place);
+      place.costs[personId] = Math.max(0, Number(value) || 0); render();
+    }
+    async function saveCosts(dayId, placeId) {
+      const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
+      await cloudSavePlace(day, place);
     }
     async function renameSightseeing(dayId, placeId, name) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
@@ -1669,31 +1998,26 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
       select.innerHTML = '<option value="all">All Days</option>' + data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("");
       if ([...select.options].some(o => o.value === current)) select.value = current;
     }
-    function foodBillMatches(bill, search, statusFilter) {
-      const statusOk = statusFilter === "all" || bill.paymentStatus === statusFilter;
-      if (!statusOk) return false;
+    function foodBillMatches(bill, search) {
       if (!search) return true;
       return [bill.restaurantShop, bill.food, bill.notes].some(v => String(v || "").toLowerCase().includes(search));
     }
     function renderFoodDays() {
-      const container = document.getElementById("foodDaysContainer"), search = document.getElementById("foodSearchInput").value.trim().toLowerCase(), dayFilter = document.getElementById("foodDayFilter").value, statusFilter = document.getElementById("foodStatusFilter").value, todayDayId = getTodayDayId();
+      const container = document.getElementById("foodDaysContainer"), search = document.getElementById("foodSearchInput").value.trim().toLowerCase(), dayFilter = document.getElementById("foodDayFilter").value, todayDayId = getTodayDayId();
       let html = "";
       data.days.forEach(day => {
         if (dayFilter !== "all" && day.id !== dayFilter) return;
-        const bills = (day.foodBills || []).filter(b => foodBillMatches(b, search, statusFilter));
-        const total = (day.foodBills || []).reduce((s, b) => s + Number(b.amount || 0), 0);
+        const bills = (day.foodBills || []).filter(b => foodBillMatches(b, search));
+        if (!bills.length) return;
+        const total = bills.reduce((s, b) => s + Number(b.amount || 0), 0);
         html += `<section class="day-card"><div class="day-header"><h2>${escapeHtml(day.name)}${day.id === todayDayId ? '<span class="today-badge">Today</span>' : ""}</h2><div class="day-total">${currency(total)}</div></div>`;
-        if (bills.length) html += `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Restaurant / Shop</th><th>Food</th><th>Category</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>${bills.map(b => renderDesktopFoodBill(day, b)).join("")}</tbody><tfoot><tr><th colspan="4">Day Total</th><th>${currency(total)}</th><th></th><th></th></tr></tfoot></table></div>`;
-        else html += `<div class="empty">No food bills match the current filter.</div>`;
-        html += `<div class="mobile-places">${bills.length ? bills.map(b => renderMobileFoodBill(day, b)).join("") : `<div class="empty">No food bills match the current filter.</div>`}</div><div class="mobile-day-total"><div class="mobile-day-total-box"><span class="small-label">Bills</span><strong>${bills.length}</strong></div><div class="mobile-day-total-box"><span class="small-label">Day Total</span><strong>${currency(total)}</strong></div></div></section>`;
+        html += `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Restaurant / Shop</th><th>Food</th><th>Category</th><th>Amount</th><th>Actions</th></tr></thead><tbody>${bills.map(b => renderDesktopFoodBill(day, b)).join("")}</tbody><tfoot><tr><th colspan="4">Day Total</th><th>${currency(total)}</th><th></th></tr></tfoot></table></div>`;
+        html += `<div class="mobile-places">${bills.map(b => renderMobileFoodBill(day, b)).join("")}</div><div class="mobile-day-total"><div class="mobile-day-total-box"><span class="small-label">Bills</span><strong>${bills.length}</strong></div><div class="mobile-day-total-box"><span class="small-label">Day Total</span><strong>${currency(total)}</strong></div></div></section>`;
       });
-      container.innerHTML = html || '<div class="card empty">No days found.</div>';
+      container.innerHTML = html || '<div class="card empty">No food bills found.</div>';
     }
     function paidByBadge(bill) {
       return bill.paidBy !== "parul" ? `<span class="visited-badge">Paid by ${escapeHtml(PEOPLE.find(p => p.id === bill.paidBy)?.name || bill.paidBy)}</span>` : "";
-    }
-    function statusBadge(bill) {
-      return `<span class="status-badge status-${escapeHtml(bill.paymentStatus)}">${escapeHtml(FOOD_STATUSES[bill.paymentStatus] || bill.paymentStatus)}</span>`;
     }
     function renderDesktopFoodBill(day, bill) {
       return `<tr><td>${escapeHtml(bill.date || "-")}</td>
@@ -1701,7 +2025,6 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
 <td>${escapeHtml(bill.food || "-")}</td>
 <td>${escapeHtml(FOOD_CATEGORIES[bill.category] || bill.category)}</td>
 <td class="total-cell">${currency(bill.amount)}</td>
-<td>${statusBadge(bill)}</td>
 <td><div class="actions"><button class="btn-small" onclick="openEditFoodBill('${day.id}','${bill.id}')" ${loadingCloud ? "disabled" : ""}>Edit</button><button class="btn-danger btn-small" onclick="deleteFoodBill('${day.id}','${bill.id}')" ${loadingCloud ? "disabled" : ""}>Delete</button></div></td></tr>`;
     }
     function renderMobileFoodBill(day, bill) {
@@ -1711,7 +2034,7 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
 <span class="mp-total">${currency(bill.amount)}</span>
 </div>
 <div class="mobile-cost-section">
-<div class="mobile-section-label">${escapeHtml(bill.date || "")} · ${escapeHtml(FOOD_CATEGORIES[bill.category] || bill.category)} · ${statusBadge(bill)}</div>
+<div class="mobile-section-label">${escapeHtml(bill.date || "")} · ${escapeHtml(FOOD_CATEGORIES[bill.category] || bill.category)}</div>
 ${bill.food ? `<div style="font-size:13px;color:var(--muted);margin-bottom:8px">${escapeHtml(bill.food)}</div>` : ""}
 ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px">📝 ${escapeHtml(bill.notes)}</div>` : ""}
 </div>
@@ -1727,7 +2050,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     let editingFoodBill = null;
     function openAddFoodBill() {
       editingFoodBill = null;
-      document.getElementById("foodModalTitle").textContent = "Add Food Bill";
+      document.getElementById("foodModalTitle").textContent = "🍽️ Add Food Bill";
       document.getElementById("foodFormSaveBtn").textContent = "Save Food Bill";
       document.getElementById("foodFormDay").disabled = false;
       populateFoodDayForm();
@@ -1735,16 +2058,17 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       document.getElementById("foodFormFood").value = "";
       document.getElementById("foodFormAmount").value = 0;
       document.getElementById("foodFormCategory").value = "lunch";
-      document.getElementById("foodFormStatus").value = "paid";
       document.getElementById("foodFormNotes").value = "";
       document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<option value="${p.id}" ${p.id === "parul" ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
-      document.getElementById("foodFormDate").value = getDayDateString(document.getElementById("foodFormDay").value);
+      document.getElementById("foodFormDay").value = getTodayDayId() || (data.days[0] ? data.days[0].id : "");
+      document.getElementById("foodFormDate").value = todayDateString();
       document.getElementById("foodModalBackdrop").classList.add("open");
+      document.getElementById("foodFab").style.display = "none";
     }
     function openEditFoodBill(dayId, billId) {
       const day = data.days.find(d => d.id === dayId), bill = day?.foodBills.find(b => b.id === billId); if (!bill) return;
       editingFoodBill = { dayId, billId };
-      document.getElementById("foodModalTitle").textContent = "Edit Food Bill";
+      document.getElementById("foodModalTitle").textContent = "🍽️ Edit Food Bill";
       document.getElementById("foodFormSaveBtn").textContent = "Update Food Bill";
       populateFoodDayForm();
       document.getElementById("foodFormDay").value = dayId;
@@ -1754,19 +2078,19 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       document.getElementById("foodFormFood").value = bill.food || "";
       document.getElementById("foodFormAmount").value = bill.amount;
       document.getElementById("foodFormCategory").value = bill.category;
-      document.getElementById("foodFormStatus").value = bill.paymentStatus;
       document.getElementById("foodFormNotes").value = bill.notes || "";
       document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<option value="${p.id}" ${p.id === bill.paidBy ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
       document.getElementById("foodModalBackdrop").classList.add("open");
+      document.getElementById("foodFab").style.display = "none";
     }
     function populateFoodDayForm() {
       const select = document.getElementById("foodFormDay");
       select.innerHTML = data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("");
-      select.onchange = () => { document.getElementById("foodFormDate").value = getDayDateString(select.value) };
     }
     async function saveFoodBill() {
       const dayId = document.getElementById("foodFormDay").value, restaurantShop = document.getElementById("foodFormRestaurant").value.trim();
-      if (!dayId || !restaurantShop) { alert("Please select a day and enter a restaurant/shop name."); return }
+      if (!restaurantShop) { alert("Please enter a restaurant/shop name."); return }
+      if (!dayId) { alert("No trip day is set up for this date yet."); return }
       const day = data.days.find(d => d.id === dayId); if (!day) return;
       const fields = {
         date: document.getElementById("foodFormDate").value || getDayDateString(dayId),
@@ -1775,7 +2099,6 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
         category: document.getElementById("foodFormCategory").value,
         amount: Math.max(0, Number(document.getElementById("foodFormAmount").value) || 0),
         paidBy: document.getElementById("foodFormPaidBy").value,
-        paymentStatus: document.getElementById("foodFormStatus").value,
         notes: document.getElementById("foodFormNotes").value.trim()
       };
       if (!day.foodBills) day.foodBills = [];
@@ -1788,7 +2111,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       }
       closeFoodModal(); render(); await cloudSaveFoodBill(day, bill);
     }
-    function closeFoodModal() { document.getElementById("foodModalBackdrop").classList.remove("open"); editingFoodBill = null }
+    function closeFoodModal() { document.getElementById("foodModalBackdrop").classList.remove("open"); document.getElementById("foodFab").style.display = ""; editingFoodBill = null }
 
     function renderFoodPayments(totals) { document.getElementById("foodPaymentSummary").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
     function renderFoodSettlement(totals) {
@@ -1835,20 +2158,6 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       return `<tr><td>${escapeHtml(name)}</td><td>${currency(paid)}</td><td>${currency(share)}</td><td>${result}</td></tr>`;
     }
 
-    function exportData() {
-      const blob = new Blob([JSON.stringify({ app: "Rajasthan Trip Expense & Sightseeing Tracker", version: DATA_VERSION, exportedAt: new Date().toISOString(), people: data.people, days: data.days }, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = "rajasthan-trip-backup-" + new Date().toISOString().slice(0, 10) + ".json"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    }
-    async function importData(event) {
-      const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
-      reader.onload = async e => {
-        try {
-          const imported = JSON.parse(e.target.result); if (!imported || !Array.isArray(imported.days)) throw new Error("Invalid backup"); if (!confirm("Import this backup?\n\nCurrent cloud trip data will be replaced.")) return;
-          data = { version: DATA_VERSION, people: PEOPLE.map(p => ({ ...p })), days: imported.days }; normalizeData(); render();
-          await apiCall("reset", {}, true); await uploadAllInitialData(); alert("Backup imported and uploaded to Google Sheets.");
-        } catch (err) { console.error(err); alert("Import failed. Please select a valid JSON backup.") } finally { event.target.value = "" }
-      }; reader.readAsText(file);
-    }
     async function resetTrip() {
       if (!confirm("Reset payment data?\n\nAll costs and Paid By selections will be reset to their default values. Sightseeing locations, days, names and visited status will NOT be changed.")) return;
       if (!confirm("FINAL CONFIRMATION\n\nReset all costs and Paid By selections to their default values?")) return;
@@ -1862,9 +2171,34 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     function closeModal() { document.getElementById("modalBackdrop").classList.remove("open") }
     document.getElementById("modalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal() });
     document.getElementById("foodModalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeFoodModal() });
-    document.addEventListener("keydown", e => { if (e.key === "Escape") { closeModal(); closeFoodModal() } });
+    document.getElementById("shareModalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeShareModal() });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") { closeModal(); closeFoodModal(); closeShareModal(); closeThemeMenu() } });
+
+    function populateThemeMenu() {
+      const menu = document.getElementById("themeMenu"), current = getSavedThemeId() || "classic-blue";
+      menu.innerHTML = '<div class="theme-menu-title">Theme</div>' + THEMES.map(t => `<button type="button" class="theme-option ${t.id === current ? "active" : ""}" data-theme="${t.id}" onclick="selectTheme('${t.id}')" role="menuitemradio" aria-checked="${t.id === current}"><span class="theme-swatch" style="background:linear-gradient(135deg, ${t.colors[0]}, ${t.colors[1]})"></span><span class="theme-option-name">${escapeHtml(t.name)}</span><span class="theme-check">✓</span></button>`).join("");
+    }
+    function selectTheme(themeId) { applyTheme(themeId); closeThemeMenu() }
+    function toggleThemeMenu(e) {
+      e.stopPropagation();
+      const picker = document.getElementById("themePicker"), isOpen = picker.classList.toggle("open");
+      document.getElementById("themePickerBtn").setAttribute("aria-expanded", isOpen);
+      document.getElementById("themeMenu").setAttribute("aria-hidden", String(!isOpen));
+    }
+    function closeThemeMenu() {
+      document.getElementById("themePicker").classList.remove("open");
+      document.getElementById("themePickerBtn").setAttribute("aria-expanded", "false");
+      document.getElementById("themeMenu").setAttribute("aria-hidden", "true");
+    }
+    document.addEventListener("click", e => { if (!e.target.closest("#themePicker")) closeThemeMenu() });
+    document.getElementById("appNavMenu").addEventListener("show.bs.collapse", closeThemeMenu);
+    populateThemeMenu();
 
     if (window.innerWidth > 700) document.querySelectorAll(".detail-section").forEach(d => d.open = true);
+
+    let savedTab = "sightseeing";
+    try { savedTab = localStorage.getItem("rtt_activeTab") || "sightseeing" } catch (e) { }
+    switchTab(savedTab === "food" ? "food" : "sightseeing");
 
     if (API_URL.includes("PASTE_YOUR")) {
       data = makeInitialData(); normalizeData(); render(); setStatus("Add Apps Script URL", "var(--orange)");
