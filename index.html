@@ -1,3756 +1,1287 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Rajasthan Trip Expense & Sightseeing Tracker</title>
-
-<style>
-:root{
-  --blue:#123b68;
-  --blue2:#1d5d9b;
-  --bg:#f1f4f8;
-  --card:#fff;
-  --border:#d9e0e8;
-  --text:#1f2937;
-  --muted:#667085;
-  --green:#16834b;
-  --green-bg:#e8f7ef;
-  --red:#c62828;
-  --orange:#b86b00;
-  --shadow:0 2px 10px rgba(16,24,40,.07);
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-}
-
-body{
-  font-family:Arial,Helvetica,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-
-button,
-input,
-select{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-  border:0;
-  border-radius:7px;
-  padding:9px 13px;
-  background:#e8edf3;
-  color:#243447;
-}
-
-button:hover{
-  filter:brightness(.96);
-}
-
-.btn-primary{
-  background:var(--blue2);
-  color:#fff;
-}
-
-.btn-green{
-  background:var(--green);
-  color:#fff;
-}
-
-.btn-danger{
-  background:var(--red);
-  color:#fff;
-}
-
-.btn-small{
-  padding:6px 9px;
-  font-size:12px;
-}
-
-/* HEADER */
-
-.header{
-  background:var(--blue);
-  color:#fff;
-  padding:16px 24px;
-  position:sticky;
-  top:0;
-  z-index:50;
-  box-shadow:0 2px 8px rgba(0,0,0,.18);
-}
-
-.header-inner{
-  max-width:1500px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-}
-
-.header h1{
-  margin:0 0 5px;
-  font-size:24px;
-}
-
-.header p{
-  margin:0;
-  color:#dce9f7;
-  font-size:13px;
-}
-
-.header-actions{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-
-/* MAIN */
-
-.container{
-  max-width:1500px;
-  margin:auto;
-  padding:20px;
-}
-
-/* SUMMARY */
-
-.summary-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:18px;
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:9px;
-  box-shadow:var(--shadow);
-  padding:16px;
-}
-
-.total-card{
-  background:var(--blue);
-  color:#fff;
-  grid-column:span 2;
-}
-
-.total-card .label{
-  color:#dbeafe;
-}
-
-.total-card .value{
-  font-size:34px;
-}
-
-.label{
-  font-size:12px;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:.4px;
-}
-
-.value{
-  font-size:23px;
-  font-weight:bold;
-  margin-top:7px;
-}
-
-/* TOOLBAR */
-
-.toolbar{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-  margin-bottom:18px;
-}
-
-.toolbar input,
-.toolbar select{
-  min-width:180px;
-  padding:9px 11px;
-  border:1px solid var(--border);
-  border-radius:7px;
-  background:#fff;
-}
-
-.save-status{
-  margin-left:auto;
-  color:var(--green);
-  font-size:13px;
-  font-weight:bold;
-}
-
-/* DAY */
-
-.day-card{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:9px;
-  box-shadow:var(--shadow);
-  margin-bottom:20px;
-  overflow:hidden;
-}
-
-.day-header{
-  background:#f8fafc;
-  padding:13px 16px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.day-header h2{
-  margin:0;
-  font-size:18px;
-  color:var(--blue);
-}
-
-.day-total{
-  font-weight:bold;
-}
-
-/* DESKTOP TABLE */
-
-.table-wrap{
-  overflow-x:auto;
-  max-height:600px;
-}
-
-table{
-  width:100%;
-  min-width:1250px;
-  border-collapse:collapse;
-}
-
-th,
-td{
-  padding:8px;
-  border-bottom:1px solid #e5e7eb;
-  text-align:center;
-  white-space:nowrap;
-}
-
-th{
-  background:#edf3f8;
-  color:#334155;
-  font-size:12px;
-  position:sticky;
-  top:0;
-  z-index:3;
-}
-
-td:first-child,
-th:first-child{
-  text-align:left;
-  position:sticky;
-  left:0;
-  z-index:2;
-  background:#fff;
-}
-
-th:first-child{
-  z-index:4;
-  background:#edf3f8;
-}
-
-td:last-child,
-th:last-child{
-  position:sticky;
-  right:0;
-  z-index:2;
-  background:#fff;
-}
-
-th:last-child{
-  z-index:4;
-  background:#edf3f8;
-}
-
-.cost-input{
-  width:78px;
-  padding:6px;
-  border:1px solid #cbd5e1;
-  border-radius:5px;
-  text-align:right;
-}
-
-.cost-input:focus{
-  outline:2px solid #93c5fd;
-  border-color:#3b82f6;
-}
-
-.name-input{
-  width:190px;
-  padding:6px;
-  border:1px solid #cbd5e1;
-  border-radius:5px;
-}
-
-.total-cell{
-  font-weight:bold;
-}
-
-.paid-select{
-  width:105px;
-  padding:5px;
-  border:1px solid #cbd5e1;
-  border-radius:5px;
-}
-
-.actions{
-  display:flex;
-  gap:5px;
-  justify-content:center;
-}
-
-.visited-row td{
-  background:var(--green-bg)!important;
-}
-
-.visited-row td:first-child{
-  background:var(--green-bg)!important;
-}
-
-.visited-badge{
-  display:inline-block;
-  font-size:11px;
-  padding:3px 6px;
-  border-radius:10px;
-  background:#d1fae5;
-  color:#065f46;
-  margin-left:5px;
-}
-
-.empty{
-  padding:25px;
-  text-align:center;
-  color:var(--muted);
-}
-
-/* MOBILE PLACE CARDS */
-
-.mobile-places{
-  display:none;
-}
-
-.mobile-place{
-  margin:10px;
-  border:1px solid var(--border);
-  border-radius:9px;
-  overflow:hidden;
-  background:#fff;
-}
-
-.mobile-place.visited{
-  border-color:#8ed3ae;
-}
-
-.mobile-place-header{
-  padding:12px;
-  background:#f8fafc;
-  border-bottom:1px solid var(--border);
-}
-
-.mobile-place.visited .mobile-place-header{
-  background:var(--green-bg);
-}
-
-.mobile-place-title{
-  width:100%;
-}
-
-.mobile-name-input{
-  width:100%;
-  min-width:0;
-  padding:9px 10px;
-  border:1px solid #cbd5e1;
-  border-radius:6px;
-  font-weight:bold;
-  color:var(--blue);
-  background:#fff;
-}
-
-.mobile-visited-label{
-  margin-top:7px;
-  display:inline-block;
-  font-size:11px;
-  padding:4px 7px;
-  border-radius:10px;
-  background:#d1fae5;
-  color:#065f46;
-  font-weight:bold;
-}
-
-.mobile-cost-section{
-  padding:11px;
-}
-
-.mobile-section-label{
-  font-size:11px;
-  font-weight:bold;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-bottom:8px;
-}
-
-.mobile-cost-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.mobile-cost-field{
-  border:1px solid #e1e7ee;
-  background:#f8fafc;
-  border-radius:7px;
-  padding:7px;
-}
-
-.mobile-cost-field label{
-  display:block;
-  font-size:11px;
-  color:#64748b;
-  margin-bottom:4px;
-}
-
-.mobile-cost-input{
-  width:100%;
-  padding:8px;
-  border:1px solid #cbd5e1;
-  border-radius:5px;
-  background:#fff;
-  text-align:right;
-  font-weight:bold;
-}
-
-.mobile-cost-input:focus{
-  outline:2px solid #93c5fd;
-}
-
-.mobile-place-summary{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  padding:0 11px 11px;
-}
-
-.mobile-total-box,
-.mobile-paid-box{
-  border:1px solid #e1e7ee;
-  border-radius:7px;
-  padding:8px;
-}
-
-.mobile-total-box .small-label,
-.mobile-paid-box .small-label{
-  display:block;
-  font-size:10px;
-  color:var(--muted);
-  margin-bottom:4px;
-  text-transform:uppercase;
-}
-
-.mobile-total-value{
-  font-size:16px;
-  font-weight:bold;
-  color:var(--blue);
-}
-
-.mobile-paid-select{
-  width:100%;
-  padding:7px;
-  border:1px solid #cbd5e1;
-  border-radius:5px;
-}
-
-.mobile-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  padding:0 11px 11px;
-}
-
-.mobile-actions button{
-  width:100%;
-}
-
-/* MOBILE DAY TOTAL */
-
-.mobile-day-total{
-  display:none;
-}
-
-/* PEOPLE */
-
-.section-title{
-  margin:28px 0 12px;
-  color:var(--blue);
-  font-size:20px;
-}
-
-.person-grid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:10px;
-}
-
-.person-card{
-  padding:13px;
-}
-
-.person-card .value{
-  font-size:18px;
-}
-
-.family-card{
-  margin-top:10px;
-  background:#f8fafc;
-}
-
-.family-title{
-  color:var(--blue);
-  font-weight:bold;
-  margin-bottom:8px;
-}
-
-.family-row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.family-person{
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:6px;
-  padding:7px 10px;
-  font-size:13px;
-}
-
-.child-tag{
-  color:#7c3aed;
-  font-size:11px;
-}
-
-/* MODAL */
-
-.modal-backdrop{
-  position:fixed;
-  inset:0;
-  background:rgba(15,23,42,.55);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:15px;
-  z-index:100;
-}
-
-.modal-backdrop.open{
-  display:flex;
-}
-
-.modal{
-  width:min(700px,100%);
-  max-height:92vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:10px;
-  box-shadow:0 15px 50px rgba(0,0,0,.25);
-}
-
-.modal-header{
-  padding:15px 18px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.modal-header h3{
-  margin:0;
-  color:var(--blue);
-}
-
-.modal-body{
-  padding:18px;
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-
-.field{
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-
-.field label{
-  font-size:12px;
-  font-weight:bold;
-  color:#475569;
-}
-
-.field input,
-.field select{
-  padding:9px;
-  border:1px solid #cbd5e1;
-  border-radius:6px;
-}
-
-.modal-footer{
-  padding:14px 18px;
-  border-top:1px solid var(--border);
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-}
-
-.close-btn{
-  background:transparent;
-  font-size:20px;
-  padding:2px 7px;
-}
-
-.status-note{
-  margin-top:10px;
-  padding:10px;
-  background:#f8fafc;
-  border-radius:6px;
-  color:var(--muted);
-  font-size:12px;
-}
-
-.footer{
-  text-align:center;
-  padding:25px;
-  color:var(--muted);
-  font-size:12px;
-}
-
-/* MOBILE */
-
-@media(max-width:700px){
-
-  body{
-    background:#eef2f6;
-  }
-
-  .header{
-    position:relative;
-    padding:14px 12px;
-  }
-
-  .header-inner{
-    display:block;
-  }
-
-  .header h1{
-    font-size:19px;
-    line-height:1.3;
-    margin-bottom:4px;
-  }
-
-  .header p{
-    font-size:12px;
-  }
-
-  .header-actions{
-    margin-top:12px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:7px;
-  }
-
-  .header-actions button{
-    width:100%;
-    min-height:40px;
-    padding:8px 5px;
-    font-size:12px;
-  }
-
-  .container{
-    padding:10px;
-  }
-
-  .summary-grid{
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    margin-bottom:12px;
-  }
-
-  .total-card{
-    grid-column:1/-1;
-    padding:14px;
-  }
-
-  .total-card .value{
-    font-size:27px;
-  }
-
-  .card{
-    padding:12px;
-    border-radius:8px;
-  }
-
-  .value{
-    font-size:18px;
-  }
-
-  .toolbar{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:7px;
-    margin-bottom:12px;
-  }
-
-  .toolbar input,
-  .toolbar select{
-    width:100%;
-    min-width:0;
-    padding:9px;
-  }
-
-  .toolbar input{
-    grid-column:1/-1;
-  }
-
-  .save-status{
-    grid-column:1/-1;
-    margin:0;
-    text-align:right;
-    font-size:12px;
-  }
-
-  .day-card{
-    border-radius:8px;
-    margin-bottom:13px;
-  }
-
-  .day-header{
-    padding:11px 12px;
-  }
-
-  .day-header h2{
-    font-size:16px;
-  }
-
-  .day-total{
-    font-size:13px;
-  }
-
-  .day-card > .table-wrap{
-    display:none;
-  }
-
-  .mobile-places{
-    display:block;
-  }
-
-  .mobile-day-total{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:7px;
-    padding:10px;
-    border-top:1px solid var(--border);
-    background:#f8fafc;
-  }
-
-  .mobile-day-total-box{
-    padding:9px;
-    border:1px solid var(--border);
-    background:#fff;
-    border-radius:7px;
-  }
-
-  .mobile-day-total-box .small-label{
-    display:block;
-    font-size:10px;
-    color:var(--muted);
-    text-transform:uppercase;
-    margin-bottom:4px;
-  }
-
-  .mobile-day-total-box strong{
-    color:var(--blue);
-  }
-
-  .person-grid{
-    grid-template-columns:1fr 1fr;
-    gap:7px;
-  }
-
-  .person-card{
-    padding:10px;
-  }
-
-  .person-card .value{
-    font-size:16px;
-  }
-
-  .payment-table,
-  .settlement-table{
-    min-width:0;
-    width:100%;
-  }
-
-  .payment-table th,
-  .payment-table td,
-  .settlement-table th,
-  .settlement-table td{
-    padding:8px 5px;
-    font-size:12px;
-  }
-
-  .modal-backdrop{
-    padding:8px;
-    align-items:flex-end;
-  }
-
-  .modal{
-    width:100%;
-    max-height:94vh;
-    border-radius:12px 12px 0 0;
-  }
-
-  .modal-header{
-    padding:13px;
-  }
-
-  .modal-body{
-    padding:13px;
-  }
-
-  .form-grid{
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-
-  .field:first-child,
-  .field:nth-child(2){
-    grid-column:1/-1;
-  }
-
-  .field input,
-  .field select{
-    padding:9px;
-  }
-
-  .modal-footer{
-    padding:11px 13px;
-  }
-
-  .modal-footer button{
-    flex:1;
-  }
-}
-
-@media(max-width:380px){
-
-  .header-actions{
-    grid-template-columns:1fr;
-  }
-
-  .summary-grid{
-    grid-template-columns:1fr;
-  }
-
-  .total-card{
-    grid-column:auto;
-  }
-
-  .toolbar{
-    grid-template-columns:1fr;
-  }
-
-  .toolbar input{
-    grid-column:auto;
-  }
-
-  .mobile-place-summary{
-    grid-template-columns:1fr;
-  }
-
-  .mobile-actions{
-    grid-template-columns:1fr;
-  }
-
-  .form-grid{
-    grid-template-columns:1fr;
-  }
-
-  .field:first-child,
-  .field:nth-child(2){
-    grid-column:auto;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Rajasthan Trip Expense & Sightseeing Tracker</title>
+  <style>
+    :root {
+      --blue: #123b68;
+      --blue2: #1d5d9b;
+      --bg: #f1f4f8;
+      --card: #fff;
+      --border: #d9e0e8;
+      --text: #1f2937;
+      --muted: #667085;
+      --green: #16834b;
+      --green-bg: #e8f7ef;
+      --red: #c62828;
+      --orange: #b86b00;
+      --shadow: 0 2px 10px rgba(16, 24, 40, .07)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text)
+    }
+
+    button,
+    input,
+    select {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 7px;
+      padding: 9px 13px;
+      background: #e8edf3;
+      color: #243447
+    }
+
+    button:hover {
+      filter: brightness(.96)
+    }
+
+    .btn-primary {
+      background: var(--blue2);
+      color: #fff
+    }
+
+    .btn-green {
+      background: var(--green);
+      color: #fff
+    }
+
+    .btn-danger {
+      background: var(--red);
+      color: #fff
+    }
+
+    .btn-small {
+      padding: 6px 9px;
+      font-size: 12px
+    }
+
+    .header {
+      background: var(--blue);
+      color: #fff;
+      padding: 16px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .18)
+    }
+
+    .header-inner {
+      max-width: 1500px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px
+    }
+
+    .header h1 {
+      margin: 0 0 5px;
+      font-size: 24px
+    }
+
+    .header p {
+      margin: 0;
+      color: #dce9f7;
+      font-size: 13px
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      justify-content: flex-end
+    }
+
+    .container {
+      max-width: 1500px;
+      margin: auto;
+      padding: 20px
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      box-shadow: var(--shadow);
+      padding: 16px
+    }
+
+    .total-card {
+      background: var(--blue);
+      color: #fff;
+      grid-column: span 2
+    }
+
+    .total-card .label {
+      color: #dbeafe
+    }
+
+    .total-card .value {
+      font-size: 34px
+    }
+
+    .label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .4px
+    }
+
+    .value {
+      font-size: 23px;
+      font-weight: bold;
+      margin-top: 7px
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px
+    }
+
+    .toolbar input,
+    .toolbar select {
+      min-width: 180px;
+      padding: 9px 11px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #fff
+    }
+
+    .save-status {
+      margin-left: auto;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: bold
+    }
+
+    .day-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      overflow: hidden
+    }
+
+    .day-header {
+      background: #f8fafc;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px
+    }
+
+    .day-header h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--blue)
+    }
+
+    .day-total {
+      font-weight: bold
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      max-height: 600px
+    }
+
+    table {
+      width: 100%;
+      min-width: 1250px;
+      border-collapse: collapse
+    }
+
+    th,
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: center;
+      white-space: nowrap
+    }
+
+    th {
+      background: #edf3f8;
+      color: #334155;
+      font-size: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 3
+    }
+
+    td:first-child,
+    th:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: #fff
+    }
+
+    th:first-child {
+      z-index: 4;
+      background: #edf3f8
+    }
+
+    td:last-child,
+    th:last-child {
+      position: sticky;
+      right: 0;
+      z-index: 2;
+      background: #fff
+    }
+
+    th:last-child {
+      z-index: 4;
+      background: #edf3f8
+    }
+
+    .cost-input {
+      width: 78px;
+      padding: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      text-align: right
+    }
+
+    .name-input {
+      width: 190px;
+      padding: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px
+    }
+
+    .paid-select {
+      width: 105px;
+      padding: 5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px
+    }
+
+    .total-cell {
+      font-weight: bold
+    }
+
+    .actions {
+      display: flex;
+      gap: 5px;
+      justify-content: center
+    }
+
+    .visited-row td,
+    .visited-row td:first-child {
+      background: var(--green-bg) !important
+    }
+
+    .visited-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 10px;
+      background: #d1fae5;
+      color: #065f46;
+      margin-left: 5px
+    }
+
+    .empty {
+      padding: 25px;
+      text-align: center;
+      color: var(--muted)
+    }
+
+    .mobile-places {
+      display: none
+    }
+
+    .mobile-place {
+      margin: 10px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      overflow: hidden;
+      background: #fff
+    }
+
+    .mobile-place.visited {
+      border-color: #8ed3ae
+    }
+
+    .mobile-place-header {
+      padding: 12px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .mobile-place.visited .mobile-place-header {
+      background: var(--green-bg)
+    }
+
+    .mobile-name-input {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-weight: bold;
+      color: var(--blue);
+      background: #fff
+    }
+
+    .mobile-visited-label {
+      margin-top: 7px;
+      display: inline-block;
+      font-size: 11px;
+      padding: 4px 7px;
+      border-radius: 10px;
+      background: #d1fae5;
+      color: #065f46;
+      font-weight: bold
+    }
+
+    .mobile-cost-section {
+      padding: 11px
+    }
+
+    .mobile-section-label {
+      font-size: 11px;
+      font-weight: bold;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px
+    }
+
+    .mobile-cost-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .mobile-cost-field {
+      border: 1px solid #e1e7ee;
+      background: #f8fafc;
+      border-radius: 7px;
+      padding: 7px
+    }
+
+    .mobile-cost-field label {
+      display: block;
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 4px
+    }
+
+    .mobile-cost-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      background: #fff;
+      text-align: right;
+      font-weight: bold
+    }
+
+    .mobile-place-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 0 11px 11px
+    }
+
+    .mobile-total-box,
+    .mobile-paid-box {
+      border: 1px solid #e1e7ee;
+      border-radius: 7px;
+      padding: 8px
+    }
+
+    .mobile-total-box .small-label,
+    .mobile-paid-box .small-label {
+      display: block;
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase
+    }
+
+    .mobile-total-value {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--blue)
+    }
+
+    .mobile-paid-select {
+      width: 100%;
+      padding: 7px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px
+    }
+
+    .mobile-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 0 11px 11px
+    }
+
+    .mobile-actions button {
+      width: 100%
+    }
+
+    .mobile-day-total {
+      display: none
+    }
+
+    .section-title {
+      margin: 28px 0 12px;
+      color: var(--blue);
+      font-size: 20px
+    }
+
+    .person-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px
+    }
+
+    .person-card {
+      padding: 13px
+    }
+
+    .person-card .value {
+      font-size: 18px
+    }
+
+    .family-card {
+      margin-top: 10px;
+      background: #f8fafc
+    }
+
+    .family-title {
+      color: var(--blue);
+      font-weight: bold;
+      margin-bottom: 8px
+    }
+
+    .family-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .family-person {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 13px
+    }
+
+    .child-tag {
+      color: #7c3aed;
+      font-size: 11px
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      z-index: 100
+    }
+
+    .modal-backdrop.open {
+      display: flex
+    }
+
+    .modal {
+      width: min(700px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, .25)
+    }
+
+    .modal-header {
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: var(--blue)
+    }
+
+    .modal-body {
+      padding: 18px
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px
+    }
+
+    .field label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #475569
+    }
+
+    .field input,
+    .field select {
+      padding: 9px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px
+    }
+
+    .modal-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px
+    }
+
+    .close-btn {
+      background: transparent;
+      font-size: 20px;
+      padding: 2px 7px
+    }
+
+    .status-note {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8fafc;
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .footer {
+      text-align: center;
+      padding: 25px;
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    @media(max-width:700px) {
+      .header {
+        position: relative;
+        padding: 14px 12px
+      }
+
+      .header-inner {
+        display: block
+      }
+
+      .header h1 {
+        font-size: 19px
+      }
+
+      .header-actions {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px
+      }
+
+      .header-actions button {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 5px;
+        font-size: 12px
+      }
+
+      .container {
+        padding: 10px
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 12px
+      }
+
+      .total-card {
+        grid-column: 1/-1;
+        padding: 14px
+      }
+
+      .total-card .value {
+        font-size: 27px
+      }
+
+      .card {
+        padding: 12px
+      }
+
+      .value {
+        font-size: 18px
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        margin-bottom: 12px
+      }
+
+      .toolbar input,
+      .toolbar select {
+        width: 100%;
+        min-width: 0
+      }
+
+      .toolbar input {
+        grid-column: 1/-1
+      }
+
+      .save-status {
+        grid-column: 1/-1;
+        margin: 0;
+        text-align: right
+      }
+
+      .day-card {
+        border-radius: 8px;
+        margin-bottom: 13px
+      }
+
+      .day-header {
+        padding: 11px 12px
+      }
+
+      .day-header h2 {
+        font-size: 16px
+      }
+
+      .day-total {
+        font-size: 13px
+      }
+
+      .day-card>.table-wrap {
+        display: none
+      }
+
+      .mobile-places {
+        display: block
+      }
+
+      .mobile-day-total {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        padding: 10px;
+        border-top: 1px solid var(--border);
+        background: #f8fafc
+      }
+
+      .mobile-day-total-box {
+        padding: 9px;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 7px
+      }
+
+      .mobile-day-total-box .small-label {
+        display: block;
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 4px
+      }
+
+      .mobile-day-total-box strong {
+        color: var(--blue)
+      }
+
+      .person-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 7px
+      }
+
+      .person-card {
+        padding: 10px
+      }
+
+      .person-card .value {
+        font-size: 16px
+      }
+
+      .payment-table,
+      .settlement-table {
+        min-width: 0;
+        width: 100%
+      }
+
+      .payment-table th,
+      .payment-table td,
+      .settlement-table th,
+      .settlement-table td {
+        padding: 8px 5px;
+        font-size: 12px
+      }
+
+      .modal-backdrop {
+        padding: 8px;
+        align-items: flex-end
+      }
+
+      .modal {
+        width: 100%;
+        max-height: 94vh;
+        border-radius: 12px 12px 0 0
+      }
+
+      .modal-header,
+      .modal-body {
+        padding: 13px
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px
+      }
+
+      .field:first-child,
+      .field:nth-child(2) {
+        grid-column: 1/-1
+      }
+
+      .modal-footer {
+        padding: 11px 13px
+      }
+
+      .modal-footer button {
+        flex: 1
+      }
+    }
+
+    @media(max-width:380px) {
+      .header-actions {
+        grid-template-columns: 1fr
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr
+      }
+
+      .total-card {
+        grid-column: auto
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr
+      }
+
+      .toolbar input {
+        grid-column: auto
+      }
+
+      .mobile-place-summary,
+      .mobile-actions {
+        grid-template-columns: 1fr
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr
+      }
+
+      .field:first-child,
+      .field:nth-child(2) {
+        grid-column: auto
+      }
+    }
+  </style>
 </head>
 
 <body>
-
-<header class="header">
-
-  <div class="header-inner">
-
-    <div>
-      <h1>Rajasthan Trip Expense & Sightseeing Tracker</h1>
-      <p>Udaipur + Chittorgarh · 3 Days · 7 People</p>
-    </div>
-
-    <div class="header-actions">
-
-      <button class="btn-primary" onclick="openAddSightseeing()">
-        + Add Sightseeing
-      </button>
-
-      <button class="btn-primary" onclick="addDay()">
-        + Add Day
-      </button>
-
-      <button onclick="exportData()">
-        Export Backup
-      </button>
-
-      <button onclick="document.getElementById('importFile').click()">
-        Import Backup
-      </button>
-
-      <button class="btn-danger" onclick="resetTrip()">
-        Reset Trip
-      </button>
-
-      <input
-        type="file"
-        id="importFile"
-        accept=".json,application/json"
-        hidden
-        onchange="importData(event)"
-      >
-
-    </div>
-
-  </div>
-
-</header>
-
-
-<main class="container">
-
-  <section class="summary-grid">
-
-    <div class="card total-card">
-      <div class="label">Total Trip Sightseeing Cost</div>
-      <div class="value" id="overallTotal">₹0</div>
-    </div>
-
-    <div class="card">
-      <div class="label">Locations</div>
-      <div class="value" id="locationCount">0</div>
-    </div>
-
-    <div class="card">
-      <div class="label">Visited</div>
-      <div class="value" id="visitedCount">0</div>
-    </div>
-
-    <div class="card">
-      <div class="label">Average / Person</div>
-      <div class="value" id="averagePersonCost">₹0</div>
-    </div>
-
-  </section>
-
-
-  <div class="toolbar">
-
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="Search sightseeing..."
-      oninput="render()"
-    >
-
-    <select id="dayFilter" onchange="render()">
-      <option value="all">All Days</option>
-    </select>
-
-    <select id="visitedFilter" onchange="render()">
-      <option value="all">All Status</option>
-      <option value="visited">Visited</option>
-      <option value="notVisited">Not Visited</option>
-    </select>
-
-    <span class="save-status" id="saveStatus">
-      Saved
-    </span>
-
-  </div>
-
-
-  <div id="daysContainer"></div>
-
-
-  <h2 class="section-title">
-    Person-wise Totals
-  </h2>
-
-  <section
-    class="person-grid"
-    id="personTotals"
-  ></section>
-
-
-  <section class="card family-card">
-
-    <div class="family-title">
-      Family Relationship
-    </div>
-
-    <div class="family-row">
-
-      <div class="family-person">
-        Rahul
+  <header class="header">
+    <div class="header-inner">
+      <div>
+        <h1>Rajasthan Trip Expense & Sightseeing Tracker</h1>
+        <p>Udaipur + Chittorgarh · 3 Days · 7 People · Google Sheets Online Sync</p>
       </div>
-
-      <div class="family-person">
-        Dhara
+      <div class="header-actions">
+        <button class="btn-primary" onclick="openAddSightseeing()">+ Add Sightseeing</button>
+        <button class="btn-primary" onclick="addDay()">+ Add Day</button>
+        <button onclick="refreshFromCloud()">↻ Refresh</button>
+        <button onclick="exportData()">Export Backup</button>
+        <button onclick="document.getElementById('importFile').click()">Import Backup</button>
+        <button class="btn-danger" onclick="resetTrip()">Reset Trip</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden onchange="importData(event)">
       </div>
+    </div>
+  </header>
 
-      <div class="family-person">
-        Dugu1 (2Y)
-        <span class="child-tag">
-          Child of Rahul & Dhara
-        </span>
+  <main class="container">
+    <section class="summary-grid">
+      <div class="card total-card">
+        <div class="label">Total Trip Sightseeing Cost</div>
+        <div class="value" id="overallTotal">₹0</div>
       </div>
-
-      <div class="family-person">
-        Dugu2 (3Y)
-        <span class="child-tag">
-          Child of Rahul & Dhara
-        </span>
+      <div class="card">
+        <div class="label">Locations</div>
+        <div class="value" id="locationCount">0</div>
       </div>
+      <div class="card">
+        <div class="label">Visited</div>
+        <div class="value" id="visitedCount">0</div>
+      </div>
+      <div class="card">
+        <div class="label">Average / Person</div>
+        <div class="value" id="averagePersonCost">₹0</div>
+      </div>
+    </section>
 
+    <div class="toolbar">
+      <input id="searchInput" type="search" placeholder="Search sightseeing..." oninput="render()">
+      <select id="dayFilter" onchange="render()">
+        <option value="all">All Days</option>
+      </select>
+      <select id="visitedFilter" onchange="render()">
+        <option value="all">All Status</option>
+        <option value="visited">Visited</option>
+        <option value="notVisited">Not Visited</option>
+      </select>
+      <span class="save-status" id="saveStatus">Connecting...</span>
     </div>
 
-  </section>
-
-
-  <h2 class="section-title">
-    Payment Summary
-  </h2>
-
-  <section class="card">
-
-    <div class="table-wrap">
-
-      <table class="payment-table">
-
-        <thead>
-
-          <tr>
-            <th>Person</th>
-            <th>Total Paid</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="paymentSummary"></tbody>
-
-      </table>
-
-    </div>
-
-  </section>
-
-
-  <h2 class="section-title">
-    Settlement
-  </h2>
-
-  <section class="card">
-
-    <div class="table-wrap">
-
-      <table class="settlement-table">
-
-        <thead>
-
-          <tr>
-            <th>Family / Person</th>
-            <th>Paid</th>
-            <th>Share</th>
-            <th>Balance</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="settlementSummary"></tbody>
-
-      </table>
-
-    </div>
-
-    <div class="status-note">
-      Settlement groups Rahul, Dhara, Dugu1 and Dugu2 as one family unit.
-      The children remain separate everywhere else in the app.
-    </div>
-
-  </section>
-
-</main>
-
-
-<footer class="footer">
-  Rajasthan Trip Tracker · Local browser storage · Export backups regularly
-</footer>
-
-
-<!-- ADD SIGHTSEEING -->
-
-<div
-  class="modal-backdrop"
-  id="modalBackdrop"
->
-
-  <div class="modal">
-
-    <div class="modal-header">
-
-      <h3>
-        Add Sightseeing
-      </h3>
-
-      <button
-        class="close-btn"
-        onclick="closeModal()"
-      >
-        ×
-      </button>
-
-    </div>
-
-    <div class="modal-body">
-
-      <form id="sightseeingForm">
-
-        <div class="form-grid">
-
-          <div class="field">
-
-            <label>Day</label>
-
-            <select
-              id="formDay"
-              required
-            ></select>
-
-          </div>
-
-          <div class="field">
-
-            <label>Sightseeing Name</label>
-
-            <input
-              id="formName"
-              required
-              placeholder="e.g. Shilpgram"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>Rahul Cost</label>
-
-            <input
-              id="costRahul"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>Dhara Cost</label>
-
-            <input
-              id="costDhara"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>Dugu1 (2Y) Cost</label>
-
-            <input
-              id="costDugu1"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>Dugu2 (3Y) Cost</label>
-
-            <input
-              id="costDugu2"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>Naren Cost</label>
-
-            <input
-              id="costNaren"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>Parul Cost</label>
-
-            <input
-              id="costParul"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-          </div>
-
-          <div class="field">
-
-            <label>Prakash Cost</label>
-
-            <input
-              id="costPrakash"
-              type="number"
-              min="0"
-              value="0"
-            >
-
-          </div>
-
-        </div>
-
-      </form>
-
-    </div>
-
-    <div class="modal-footer">
-
-      <button onclick="closeModal()">
-        Cancel
-      </button>
-
-      <button
-        class="btn-primary"
-        onclick="saveSightseeing()"
-      >
-        Save Sightseeing
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<script>
-
-/* =====================================================
-   VERSION
-===================================================== */
-
-/*
-  IMPORTANT:
-
-  Whenever you manually change INITIAL_DAYS,
-  increase this number.
-
-  Example:
-  1 -> 2
-
-  The application will then synchronize
-  removed ORIGINAL locations from localStorage.
-
-  User-added locations will NOT be deleted.
-*/
-
-const DATA_VERSION = 2;
-
-const STORAGE_KEY =
-  "rajasthanTripTrackerV1";
-
-
-/* =====================================================
-   PEOPLE
-===================================================== */
-
-const PEOPLE = [
-
-  {
-    id:"rahul",
-    name:"Rahul",
-    family:"rahul-dhara"
-  },
-
-  {
-    id:"dhara",
-    name:"Dhara",
-    family:"rahul-dhara"
-  },
-
-  {
-    id:"dugu1",
-    name:"Dugu1 (2Y)",
-    family:"rahul-dhara",
-    childOf:["rahul","dhara"]
-  },
-
-  {
-    id:"dugu2",
-    name:"Dugu2 (3Y)",
-    family:"rahul-dhara",
-    childOf:["rahul","dhara"]
-  },
-
-  {
-    id:"naren",
-    name:"Naren",
-    family:"naren"
-  },
-
-  {
-    id:"parul",
-    name:"Parul",
-    family:"parul"
-  },
-
-  {
-    id:"prakash",
-    name:"Prakash",
-    family:"prakash"
-  }
-
-];
-
-
-/* =====================================================
-   INITIAL ITINERARY
-===================================================== */
-
-const INITIAL_DAYS = [
-
-  {
-    id:"day-1",
-    name:"Day 1",
-
-    places:[
-
-
-      ["city-palace","City Palace",
-        400,400,0,0,400,400,400],
-
-      ["jagdish-temple","Jagdish Temple",0],
-
-      ["lake-pichola-boat","Lake Pichola / Boat",
-        400,400,0,0,400,400,400],
-
-      ["jag-mandir","Jag Mandir",
-        600,600,0,0,600,600,600],
-
-      ["bagore-ki-haveli","Bagore Ki Haveli",
-        60,60,0,0,60,60,60],
-
-      ["gangaur-ghat","Gangaur Ghat",0],
-
-      ["ambrai-ghat","Ambrai Ghat",0]
-
-    ]
-  },
-
-
-  {
-    id:"day-2",
-    name:"Day 2",
-
-    places:[
-
-
-      ["bahubali-hills","Bahubali Hills",0],
-
-      ["badi-lake","Badi Lake",0],
-
-      ["saheliyon-ki-bari","Saheliyon Ki Bari",
-        10,10,0,0,10,10,10],
-
-      ["fateh-sagar","Fateh Sagar",0],
-
-      ["sajjangarh-fort","Sajjangarh Fort",
-        30,30,0,0,30,30,30],
-
-      ["doodh-talai","Doodh Talai",0],
-
-      ["karni-mata-ropeway","Karni Mata Ropeway",
-        117,117,0,55,117,117,117],
-
-
-    ]
-  },
-
-
-  {
-    id:"day-3",
-    name:"Day 3",
-
-    places:[
-
-      ["udaipur-chittorgarh","Udaipur → Chittorgarh",0],
-
-      ["chittorgarh-fort","Chittorgarh Fort",
-        40,40,0,0,40,40,40],
-
-      ["rana-kumbha-palace","Rana Kumbha Palace",0],
-
-      ["vijay-stambh","Vijay Stambh",0],
-
-      ["meera-temple","Meera Temple",0],
-
-      ["kirti-stambh","Kirti Stambh",0],
-
-      ["padmini-palace","Padmini Palace",0],
-
-      ["kalika-mata-temple","Kalika Mata Temple",0],
-
-      ["gaumukh","Gaumukh",0],
-
-      ["chittorgarh-udaipur","Chittorgarh → Udaipur",0]
-
-    ]
-  }
-
-];
-
-
-let data=null;
-
-
-/* =====================================================
-   UNIQUE ID
-===================================================== */
-
-function uid(prefix="id"){
-
-  return prefix+"-"+
-    Date.now().toString(36)+"-"+
-    Math.random().toString(36).slice(2,9);
-
-}
-
-
-/* =====================================================
-   CURRENCY
-===================================================== */
-
-function currency(value){
-
-  return "₹"+
-    Number(value||0)
-      .toLocaleString("en-IN");
-
-}
-
-
-/* =====================================================
-   HTML ESCAPE
-===================================================== */
-
-function escapeHtml(value){
-
-  return String(value??"")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
-   CAPITALIZE
-===================================================== */
-
-function capitalize(value){
-
-  return value.charAt(0).toUpperCase()+
-    value.slice(1);
-
-}
-
-
-/* =====================================================
-   INITIAL DATA CREATOR
-===================================================== */
-
-function makeInitialData(){
-
-  return {
-
-    version:DATA_VERSION,
-
-    people:PEOPLE.map(p=>({...p})),
-
-    days:INITIAL_DAYS.map(day=>({
-
-      id:day.id,
-
-      name:day.name,
-
-      places:day.places.map(p=>{
-
-        const costs={};
-
-        PEOPLE.forEach((person,index)=>{
-
-          costs[person.id]=
-            Number(p[index+2]||0);
-
-        });
-
-        return {
-
-          id:uid("place"),
-
-          sourceKey:p[0],
-
-          original:true,
-
-          name:p[1],
-
-          costs:costs,
-
-          visited:false,
-
-          paidBy:"Not Paid"
-
-        };
-
-      })
-
-    }))
-
-  };
-
-}
-
-
-/* =====================================================
-   GET SOURCE PLACE KEYS
-===================================================== */
-
-function getInitialSourceKeys(){
-
-  const keys=new Set();
-
-  INITIAL_DAYS.forEach(day=>{
-
-    day.places.forEach(place=>{
-
-      keys.add(place[0]);
-
-    });
-
-  });
-
-  return keys;
-
-}
-
-
-/* =====================================================
-   MIGRATE OLD DATA
-===================================================== */
-
-function migrateData(){
-
-  if(!data)return;
-
-  /*
-    Old data may not have version/sourceKey.
-
-    We don't blindly delete old locations.
-
-    First migration gives existing locations
-    sourceKey values by matching day + name.
-  */
-
-  data.days.forEach(day=>{
-
-    const initialDay=
-      INITIAL_DAYS.find(
-        d=>d.id===day.id
-      );
-
-    if(!initialDay)return;
-
-    day.places.forEach(place=>{
-
-      if(place.sourceKey)return;
-
-      const source=
-        initialDay.places.find(
-          p=>p[1]===place.name
-        );
-
-      if(source){
-
-        place.sourceKey=source[0];
-
-        place.original=true;
-
-      }else{
-
-        place.original=false;
-
-      }
-
-    });
-
-  });
-
-
-  /*
-    If stored version is older than current source version,
-    remove original places which no longer exist in INITIAL_DAYS.
-
-    User-created locations remain untouched.
-  */
-
-  if(
-    Number(data.version||1) <
-    DATA_VERSION
-  ){
-
-    const validSourceKeys=
-      getInitialSourceKeys();
-
-    data.days.forEach(day=>{
-
-      day.places=
-        day.places.filter(place=>{
-
-          if(place.original===true){
-
-            return validSourceKeys.has(
-              place.sourceKey
-            );
-
-          }
-
-          return true;
-
-        });
-
-    });
-
-    data.version=
-      DATA_VERSION;
-
-  }
-
-}
-
-
-/* =====================================================
-   NORMALIZE
-===================================================== */
-
-function normalizeImportedData(){
-
-  if(!Array.isArray(data.days)){
-    data.days=[];
-  }
-
-  data.days.forEach(day=>{
-
-    if(!day.id){
-      day.id=uid("day");
-    }
-
-    if(!day.name){
-      day.name="Day";
-    }
-
-    if(!Array.isArray(day.places)){
-      day.places=[];
-    }
-
-    day.places.forEach(place=>{
-
-      if(!place.id){
-        place.id=uid("place");
-      }
-
-      if(!place.name){
-        place.name="Sightseeing";
-      }
-
-      if(!place.costs){
-        place.costs={};
-      }
-
-      PEOPLE.forEach(person=>{
-
-        place.costs[person.id]=
-          Math.max(
-            0,
-            Number(
-              place.costs[person.id]
-            )||0
-          );
-
-      });
-
-      place.visited=
-        Boolean(place.visited);
-
-      const validPaidBy=
-        PEOPLE.some(
-          person=>
-            person.id===place.paidBy
-        );
-
-      if(!validPaidBy){
-        place.paidBy="Not Paid";
-      }
-
-      if(
-        typeof place.original!=="boolean"
-      ){
-
-        place.original=
-          Boolean(place.sourceKey);
-
-      }
-
-    });
-
-  });
-
-}
-
-
-/* =====================================================
-   LOAD DATA
-===================================================== */
-
-function loadData(){
-
-  try{
-
-    const raw=
-      localStorage.getItem(
-        STORAGE_KEY
-      );
-
-    if(!raw){
-
-      data=
-        makeInitialData();
-
-      saveData();
-
-      return;
-
-    }
-
-    data=
-      JSON.parse(raw);
-
-    if(
-      !data ||
-      !Array.isArray(data.days)
-    ){
-
-      throw new Error(
-        "Invalid stored data"
-      );
-
-    }
-
-    normalizeImportedData();
-
-    migrateData();
-
-    saveData();
-
-  }catch(error){
-
-    console.error(error);
-
-    data=
-      makeInitialData();
-
-    saveData();
-
-  }
-
-}
-
-
-/* =====================================================
-   SAVE
-===================================================== */
-
-function saveData(){
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(data)
-  );
-
-}
-
-
-function saveWithStatus(){
-
-  const status=
-    document.getElementById(
-      "saveStatus"
-    );
-
-  if(status){
-
-    status.textContent=
-      "Saving...";
-
-    status.style.color=
-      "var(--orange)";
-
-  }
-
-  saveData();
-
-  setTimeout(()=>{
-
-    if(status){
-
-      status.textContent=
-        "Saved";
-
-      status.style.color=
-        "var(--green)";
-
-    }
-
-  },150);
-
-}
-
-
-/* =====================================================
-   PLACE TOTAL
-===================================================== */
-
-function getPlaceTotal(place){
-
-  return PEOPLE.reduce(
-
-    (total,person)=>
-
-      total+
-      Number(
-        place.costs[person.id]||0
-      ),
-
-    0
-
-  );
-
-}
-
-
-/* =====================================================
-   DAY TOTAL
-===================================================== */
-
-function getDayTotals(day){
-
-  const totals={};
-
-  PEOPLE.forEach(person=>{
-
-    totals[person.id]=0;
-
-  });
-
-  day.places.forEach(place=>{
-
-    PEOPLE.forEach(person=>{
-
-      totals[person.id]+=
-        Number(
-          place.costs[person.id]||0
-        );
-
-    });
-
-  });
-
-  totals.overall=
-    PEOPLE.reduce(
-
-      (sum,person)=>
-        sum+totals[person.id],
-
-      0
-
-    );
-
-  return totals;
-
-}
-
-
-/* =====================================================
-   OVERALL TOTALS
-===================================================== */
-
-function calculateTotals(){
-
-  const totals={
-
-    people:{},
-
-    payments:{},
-
-    overall:0,
-
-    locations:0,
-
-    visited:0
-
-  };
-
-  PEOPLE.forEach(person=>{
-
-    totals.people[person.id]=0;
-
-    totals.payments[person.id]=0;
-
-  });
-
-  totals.payments["Not Paid"]=0;
-
-  data.days.forEach(day=>{
-
-    day.places.forEach(place=>{
-
-      totals.locations++;
-
-      if(place.visited){
-        totals.visited++;
-      }
-
-      PEOPLE.forEach(person=>{
-
-        const cost=
-          Number(
-            place.costs[person.id]||0
-          );
-
-        totals.people[person.id]+=cost;
-
-        totals.overall+=cost;
-
-      });
-
-      const total=
-        getPlaceTotal(place);
-
-      if(
-        place.paidBy &&
-        place.paidBy!=="Not Paid"
-      ){
-
-        totals.payments[place.paidBy]+=
-          total;
-
-      }else{
-
-        totals.payments["Not Paid"]+=
-          total;
-
-      }
-
-    });
-
-  });
-
-  return totals;
-
-}
-
-
-/* =====================================================
-   RENDER
-===================================================== */
-
-function render(){
-
-  if(!data)return;
-
-  const totals=
-    calculateTotals();
-
-  document.getElementById(
-    "overallTotal"
-  ).textContent=
-    currency(totals.overall);
-
-  document.getElementById(
-    "locationCount"
-  ).textContent=
-    totals.locations;
-
-  document.getElementById(
-    "visitedCount"
-  ).textContent=
-    totals.visited+
-    " / "+
-    totals.locations;
-
-  document.getElementById(
-    "averagePersonCost"
-  ).textContent=
-    currency(
-      totals.overall/
-      PEOPLE.length
-    );
-
-  renderDayFilter();
-
-  renderDays();
-
-  renderPersonTotals(totals);
-
-  renderPayments(totals);
-
-  renderSettlement(totals);
-
-}
-
-
-/* =====================================================
-   DAY FILTER
-===================================================== */
-
-function renderDayFilter(){
-
-  const select=
-    document.getElementById(
-      "dayFilter"
-    );
-
-  const current=
-    select.value;
-
-  select.innerHTML=
-    `<option value="all">
-      All Days
-    </option>`+
-
-    data.days.map(day=>
-
-      `<option value="${escapeHtml(day.id)}">
-        ${escapeHtml(day.name)}
-      </option>`
-
-    ).join("");
-
-  if(
-    [...select.options]
-      .some(
-        option=>
-          option.value===current
-      )
-  ){
-
-    select.value=current;
-
-  }
-
-}
-
-
-/* =====================================================
-   RENDER DAYS
-===================================================== */
-
-function renderDays(){
-
-  const container=
-    document.getElementById(
-      "daysContainer"
-    );
-
-  const search=
-    document.getElementById(
-      "searchInput"
-    ).value
-      .trim()
-      .toLowerCase();
-
-  const dayFilter=
-    document.getElementById(
-      "dayFilter"
-    ).value;
-
-  const visitedFilter=
-    document.getElementById(
-      "visitedFilter"
-    ).value;
-
-  let html="";
-
-  data.days.forEach(day=>{
-
-    if(
-      dayFilter!=="all" &&
-      day.id!==dayFilter
-    ){
-      return;
-    }
-
-    const visiblePlaces=
-      day.places.filter(place=>{
-
-        const matchesSearch=
-          !search ||
-          place.name
-            .toLowerCase()
-            .includes(search);
-
-        const matchesVisited=
-          visitedFilter==="all" ||
-
-          (
-            visitedFilter==="visited" &&
-            place.visited
-          ) ||
-
-          (
-            visitedFilter==="notVisited" &&
-            !place.visited
-          );
-
-        return(
-          matchesSearch &&
-          matchesVisited
-        );
-
-      });
-
-    const totals=
-      getDayTotals(day);
-
-    html+=`
-
-      <section class="day-card">
-
-        <div class="day-header">
-
-          <h2>
-            ${escapeHtml(day.name)}
-          </h2>
-
-          <div class="day-total">
-            ${currency(totals.overall)}
-          </div>
-
-        </div>
-
-
-        <!-- DESKTOP -->
-
-        ${
-          visiblePlaces.length
-          ?
-          `
-
-          <div class="table-wrap">
-
-            <table>
-
-              <thead>
-
-                <tr>
-
-                  <th>Sightseeing</th>
-
-                  ${PEOPLE.map(person=>
-                    `<th>
-                      ${escapeHtml(person.name)}
-                    </th>`
-                  ).join("")}
-
-                  <th>Total</th>
-
-                  <th>Paid By</th>
-
-                  <th>Actions</th>
-
-                </tr>
-
-              </thead>
-
-
-              <tbody>
-
-                ${visiblePlaces
-                  .map(place=>
-                    renderDesktopPlace(
-                      day,
-                      place
-                    )
-                  )
-                  .join("")}
-
-              </tbody>
-
-
-              <tfoot>
-
-                <tr>
-
-                  <th>
-                    Day Total
-                  </th>
-
-                  ${PEOPLE.map(person=>
-                    `<th>
-                      ${currency(
-                        totals[person.id]
-                      )}
-                    </th>`
-                  ).join("")}
-
-                  <th>
-                    ${currency(
-                      totals.overall
-                    )}
-                  </th>
-
-                  <th></th>
-
-                  <th></th>
-
-                </tr>
-
-              </tfoot>
-
-            </table>
-
-          </div>
-
-          `
-          :
-          `
-          <div class="empty">
-            No sightseeing matches the current filter.
-          </div>
-          `
-        }
-
-
-        <!-- MOBILE -->
-
-        <div class="mobile-places">
-
-          ${
-            visiblePlaces.length
-            ?
-            visiblePlaces
-              .map(place=>
-                renderMobilePlace(
-                  day,
-                  place
-                )
-              )
-              .join("")
-            :
-            `
-            <div class="empty">
-              No sightseeing matches the current filter.
+    <div id="daysContainer"></div>
+
+    <h2 class="section-title">Person-wise Totals</h2>
+    <section class="person-grid" id="personTotals"></section>
+
+    <section class="card family-card">
+      <div class="family-title">Family Relationship</div>
+      <div class="family-row">
+        <div class="family-person">Rahul</div>
+        <div class="family-person">Dhara</div>
+        <div class="family-person">Dugu1 (2Y) <span class="child-tag">Child of Rahul & Dhara</span></div>
+        <div class="family-person">Dugu2 (3Y) <span class="child-tag">Child of Rahul & Dhara</span></div>
+      </div>
+    </section>
+
+    <h2 class="section-title">Payment Summary</h2>
+    <section class="card">
+      <div class="table-wrap">
+        <table class="payment-table">
+          <thead>
+            <tr>
+              <th>Person</th>
+              <th>Total Paid</th>
+            </tr>
+          </thead>
+          <tbody id="paymentSummary"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <h2 class="section-title">Settlement</h2>
+    <section class="card">
+      <div class="table-wrap">
+        <table class="settlement-table">
+          <thead>
+            <tr>
+              <th>Family / Person</th>
+              <th>Paid</th>
+              <th>Share</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="settlementSummary"></tbody>
+        </table>
+      </div>
+      <div class="status-note">Settlement groups Rahul, Dhara, Dugu1 and Dugu2 as one family unit. The children remain
+        separate everywhere else.</div>
+    </section>
+  </main>
+
+  <footer class="footer">Rajasthan Trip Tracker · Online Google Sheets storage · Changes sync automatically</footer>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add Sightseeing</h3><button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="sightseeingForm">
+          <div class="form-grid">
+            <div class="field"><label>Day</label><select id="formDay" required></select></div>
+            <div class="field"><label>Sightseeing Name</label><input id="formName" required
+                placeholder="e.g. Shilpgram"></div>
+            <div class="field"><label>Rahul Cost</label><input id="costRahul" type="number" min="0" value="0"></div>
+            <div class="field"><label>Dhara Cost</label><input id="costDhara" type="number" min="0" value="0"></div>
+            <div class="field"><label>Dugu1 (2Y) Cost</label><input id="costDugu1" type="number" min="0" value="0">
             </div>
-            `
-          }
-
-        </div>
-
-
-        <div class="mobile-day-total">
-
-          <div class="mobile-day-total-box">
-
-            <span class="small-label">
-              Places
-            </span>
-
-            <strong>
-              ${visiblePlaces.length}
-            </strong>
-
-          </div>
-
-          <div class="mobile-day-total-box">
-
-            <span class="small-label">
-              Day Total
-            </span>
-
-            <strong>
-              ${currency(totals.overall)}
-            </strong>
-
-          </div>
-
-        </div>
-
-      </section>
-
-    `;
-
-  });
-
-  if(!html){
-
-    html=`
-      <div class="card empty">
-        No days found.
-      </div>
-    `;
-
-  }
-
-  container.innerHTML=html;
-
-}
-
-
-/* =====================================================
-   DESKTOP PLACE
-===================================================== */
-
-function renderDesktopPlace(
-  day,
-  place
-){
-
-  const total=
-    getPlaceTotal(place);
-
-  return `
-
-    <tr class="${
-      place.visited
-      ?"visited-row"
-      :""
-    }">
-
-      <td>
-
-        <input
-          class="name-input"
-          value="${escapeHtml(place.name)}"
-          onchange="
-            renameSightseeing(
-              '${day.id}',
-              '${place.id}',
-              this.value
-            )
-          "
-        >
-
-        ${
-          place.visited
-          ?
-          `
-          <span class="visited-badge">
-            ✓ Visited
-          </span>
-          `
-          :
-          ""
-        }
-
-      </td>
-
-
-      ${PEOPLE.map(person=>`
-
-        <td>
-
-          <input
-            class="cost-input"
-            type="number"
-            min="0"
-            step="1"
-            value="${Number(
-              place.costs[person.id]||0
-            )}"
-            onchange="
-              updateCost(
-                '${day.id}',
-                '${place.id}',
-                '${person.id}',
-                this.value
-              )
-            "
-          >
-
-        </td>
-
-      `).join("")}
-
-
-      <td class="total-cell">
-        ${currency(total)}
-      </td>
-
-
-      <td>
-
-        ${renderPaidSelect(
-          day.id,
-          place.id,
-          place.paidBy,
-          false
-        )}
-
-      </td>
-
-
-      <td>
-
-        <div class="actions">
-
-          <button
-            class="${
-              place.visited
-              ?"btn-green"
-              :""
-            } btn-small"
-            onclick="
-              toggleVisited(
-                '${day.id}',
-                '${place.id}'
-              )
-            "
-          >
-            ${
-              place.visited
-              ?"✓ Visited"
-              :"Visited"
-            }
-          </button>
-
-
-          <button
-            class="btn-danger btn-small"
-            onclick="
-              deleteSightseeing(
-                '${day.id}',
-                '${place.id}'
-              )
-            "
-          >
-            Delete
-          </button>
-
-        </div>
-
-      </td>
-
-    </tr>
-
-  `;
-
-}
-
-
-/* =====================================================
-   MOBILE PLACE
-===================================================== */
-
-function renderMobilePlace(
-  day,
-  place
-){
-
-  const total=
-    getPlaceTotal(place);
-
-  return `
-
-    <div
-      class="
-        mobile-place
-        ${place.visited?"visited":""}
-      "
-    >
-
-      <div class="mobile-place-header">
-
-        <div class="mobile-place-title">
-
-          <input
-            class="mobile-name-input"
-            value="${escapeHtml(place.name)}"
-            onchange="
-              renameSightseeing(
-                '${day.id}',
-                '${place.id}',
-                this.value
-              )
-            "
-          >
-
-        </div>
-
-
-        ${
-          place.visited
-          ?
-          `
-          <span class="mobile-visited-label">
-            ✓ VISITED
-          </span>
-          `
-          :
-          ""
-        }
-
-      </div>
-
-
-      <div class="mobile-cost-section">
-
-        <div class="mobile-section-label">
-          Ticket Cost
-        </div>
-
-
-        <div class="mobile-cost-grid">
-
-          ${PEOPLE.map(person=>`
-
-            <div class="mobile-cost-field">
-
-              <label>
-                ${escapeHtml(
-                  person.name
-                )}
-              </label>
-
-              <input
-                class="mobile-cost-input"
-                type="number"
-                min="0"
-                step="1"
-                value="${Number(
-                  place.costs[person.id]||0
-                )}"
-                onchange="
-                  updateCost(
-                    '${day.id}',
-                    '${place.id}',
-                    '${person.id}',
-                    this.value
-                  )
-                "
-              >
-
+            <div class="field"><label>Dugu2 (3Y) Cost</label><input id="costDugu2" type="number" min="0" value="0">
             </div>
-
-          `).join("")}
-
-        </div>
-
-      </div>
-
-
-      <div class="mobile-place-summary">
-
-        <div class="mobile-total-box">
-
-          <span class="small-label">
-            Sightseeing Total
-          </span>
-
-          <div class="mobile-total-value">
-            ${currency(total)}
+            <div class="field"><label>Naren Cost</label><input id="costNaren" type="number" min="0" value="0"></div>
+            <div class="field"><label>Parul Cost</label><input id="costParul" type="number" min="0" value="0"></div>
+            <div class="field"><label>Prakash Cost</label><input id="costPrakash" type="number" min="0" value="0"></div>
           </div>
-
-        </div>
-
-
-        <div class="mobile-paid-box">
-
-          <span class="small-label">
-            Paid By
-          </span>
-
-          ${renderPaidSelect(
-            day.id,
-            place.id,
-            place.paidBy,
-            true
-          )}
-
-        </div>
-
+        </form>
       </div>
-
-
-      <div class="mobile-actions">
-
-        <button
-          class="${
-            place.visited
-            ?"btn-green"
-            :"btn-primary"
-          }"
-          onclick="
-            toggleVisited(
-              '${day.id}',
-              '${place.id}'
-            )
-          "
-        >
-          ${
-            place.visited
-            ?"✓ Visited"
-            :"Mark Visited"
-          }
-        </button>
-
-
-        <button
-          class="btn-danger"
-          onclick="
-            deleteSightseeing(
-              '${day.id}',
-              '${place.id}'
-            )
-          "
-        >
-          Delete
-        </button>
-
-      </div>
-
+      <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary"
+          onclick="saveSightseeing()">Save Sightseeing</button></div>
     </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   PAID BY
-===================================================== */
-
-function renderPaidSelect(
-  dayId,
-  placeId,
-  paidBy,
-  mobile
-){
-
-  return `
-
-    <select
-      class="${
-        mobile
-        ?"mobile-paid-select"
-        :"paid-select"
-      }"
-      onchange="
-        updatePaidBy(
-          '${dayId}',
-          '${placeId}',
-          this.value
-        )
-      "
-    >
-
-      <option
-        value="Not Paid"
-        ${
-          paidBy==="Not Paid"
-          ?"selected"
-          :""
-        }
-      >
-        Not Paid
-      </option>
-
-
-      ${PEOPLE.map(person=>`
-
-        <option
-          value="${person.id}"
-          ${
-            paidBy===person.id
-            ?"selected"
-            :""
-          }
-        >
-          ${escapeHtml(
-            person.name
-          )}
-        </option>
-
-      `).join("")}
-
-    </select>
-
-  `;
-
-}
-
-
-/* =====================================================
-   UPDATE COST
-===================================================== */
-
-function updateCost(
-  dayId,
-  placeId,
-  personId,
-  value
-){
-
-  const day=
-    data.days.find(
-      d=>d.id===dayId
-    );
-
-  if(!day)return;
-
-  const place=
-    day.places.find(
-      p=>p.id===placeId
-    );
-
-  if(!place)return;
-
-  place.costs[personId]=
-    Math.max(
-      0,
-      Number(value)||0
-    );
-
-  saveWithStatus();
-
-  render();
-
-}
-
-
-/* =====================================================
-   RENAME
-===================================================== */
-
-function renameSightseeing(
-  dayId,
-  placeId,
-  name
-){
-
-  const day=
-    data.days.find(
-      d=>d.id===dayId
-    );
-
-  const place=
-    day?.places.find(
-      p=>p.id===placeId
-    );
-
-  if(!place)return;
-
-  const cleaned=
-    String(name).trim();
-
-  if(!cleaned){
-
-    alert(
-      "Sightseeing name cannot be empty."
-    );
-
-    render();
-
-    return;
-
-  }
-
-  place.name=cleaned;
-
-  saveWithStatus();
-
-  render();
-
-}
-
-
-/* =====================================================
-   PAID BY
-===================================================== */
-
-function updatePaidBy(
-  dayId,
-  placeId,
-  value
-){
-
-  const day=
-    data.days.find(
-      d=>d.id===dayId
-    );
-
-  const place=
-    day?.places.find(
-      p=>p.id===placeId
-    );
-
-  if(!place)return;
-
-  place.paidBy=
-    value||"Not Paid";
-
-  saveWithStatus();
-
-  render();
-
-}
-
-
-/* =====================================================
-   VISITED
-===================================================== */
-
-function toggleVisited(
-  dayId,
-  placeId
-){
-
-  const day=
-    data.days.find(
-      d=>d.id===dayId
-    );
-
-  const place=
-    day?.places.find(
-      p=>p.id===placeId
-    );
-
-  if(!place)return;
-
-  place.visited=
-    !place.visited;
-
-  saveWithStatus();
-
-  render();
-
-}
-
-
-/* =====================================================
-   DELETE SIGHTSEEING
-===================================================== */
-
-function deleteSightseeing(
-  dayId,
-  placeId
-){
-
-  const day=
-    data.days.find(
-      d=>d.id===dayId
-    );
-
-  if(!day)return;
-
-  const place=
-    day.places.find(
-      p=>p.id===placeId
-    );
-
-  if(!place)return;
-
-  if(
-    !confirm(
-      `Delete "${place.name}"?\n\n`+
-      `This sightseeing and its costs will be removed.`
-    )
-  ){
-
-    return;
-
-  }
-
-  day.places=
-    day.places.filter(
-      p=>p.id!==placeId
-    );
-
-  saveWithStatus();
-
-  render();
-
-}
-
-
-/* =====================================================
-   ADD SIGHTSEEING
-===================================================== */
-
-function openAddSightseeing(){
-
-  populateDayForm();
-
-  document.getElementById(
-    "formName"
-  ).value="";
-
-  PEOPLE.forEach(person=>{
-
-    document.getElementById(
-      "cost"+capitalize(
-        person.id
-      )
-    ).value=0;
-
-  });
-
-  document
-    .getElementById(
-      "modalBackdrop"
-    )
-    .classList.add("open");
-
-}
-
-
-function populateDayForm(){
-
-  document.getElementById(
-    "formDay"
-  ).innerHTML=
-
-    data.days.map(day=>
-
-      `<option value="${escapeHtml(day.id)}">
-        ${escapeHtml(day.name)}
-      </option>`
-
-    ).join("");
-
-}
-
-
-function saveSightseeing(){
-
-  const dayId=
-    document.getElementById(
-      "formDay"
-    ).value;
-
-  const name=
-    document.getElementById(
-      "formName"
-    ).value.trim();
-
-  if(!dayId||!name){
-
-    alert(
-      "Please select a day and enter a sightseeing name."
-    );
-
-    return;
-
-  }
-
-  const day=
-    data.days.find(
-      d=>d.id===dayId
-    );
-
-  if(!day)return;
-
-  const costs={};
-
-  PEOPLE.forEach(person=>{
-
-    costs[person.id]=
-      Math.max(
-        0,
-        Number(
-          document.getElementById(
-            "cost"+capitalize(
-              person.id
-            )
-          ).value
-        )||0
-      );
-
-  });
-
-
-  /*
-    IMPORTANT:
-
-    No sourceKey.
-    No original=true.
-
-    Therefore this location is treated
-    as a USER-ADDED location and will
-    never be removed by source migration.
-  */
-
-  day.places.push({
-
-    id:uid("place"),
-
-    sourceKey:null,
-
-    original:false,
-
-    name:name,
-
-    costs:costs,
-
-    visited:false,
-
-    paidBy:"Not Paid"
-
-  });
-
-
-  saveWithStatus();
-
-  closeModal();
-
-  render();
-
-}
-
-
-/* =====================================================
-   ADD DAY
-===================================================== */
-
-function addDay(){
-
-  const name=
-    prompt(
-      "Enter the new day name:",
-      `Day ${data.days.length+1}`
-    );
-
-  if(name===null)return;
-
-  const cleaned=
-    name.trim();
-
-  if(!cleaned){
-
-    alert(
-      "Day name cannot be empty."
-    );
-
-    return;
-
-  }
-
-  data.days.push({
-
-    id:uid("day"),
-
-    name:cleaned,
-
-    places:[]
-
-  });
-
-  saveWithStatus();
-
-  render();
-
-}
-
-
-/* =====================================================
-   PERSON TOTALS
-===================================================== */
-
-function renderPersonTotals(
-  totals
-){
-
-  document.getElementById(
-    "personTotals"
-  ).innerHTML=
-
-    PEOPLE.map(person=>`
-
-      <div class="card person-card">
-
-        <div class="label">
-          ${escapeHtml(
-            person.name
-          )}
-        </div>
-
-        <div class="value">
-          ${currency(
-            totals.people[
-              person.id
-            ]
-          )}
-        </div>
-
-      </div>
-
-    `).join("");
-
-}
-
-
-/* =====================================================
-   PAYMENT SUMMARY
-===================================================== */
-
-function renderPayments(
-  totals
-){
-
-  const tbody=
-    document.getElementById(
-      "paymentSummary"
-    );
-
-  tbody.innerHTML=
-
-    PEOPLE.map(person=>`
-
-      <tr>
-
-        <td>
-          ${escapeHtml(
-            person.name
-          )}
-        </td>
-
-        <td>
-          ${currency(
-            totals.payments[
-              person.id
-            ]||0
-          )}
-        </td>
-
-      </tr>
-
-    `).join("")+
-
-    `
-
-      <tr>
-
-        <td>
-          <strong>
-            Not Paid
-          </strong>
-        </td>
-
-        <td>
-          <strong>
-            ${currency(
-              totals.payments[
-                "Not Paid"
-              ]||0
-            )}
-          </strong>
-        </td>
-
-      </tr>
-
-    `;
-
-}
-
-
-/* =====================================================
-   FAMILY SETTLEMENT
-===================================================== */
-
-function renderSettlement(
-  totals
-){
-
-  /*
-    Rahul + Dhara + Dugu1 + Dugu2
-    are one family unit.
-
-    Naren, Parul and Prakash
-    are individual units.
-
-    This means 4 settlement shares:
-
-      Rahul + Dhara + children
-      Naren
-      Parul
-      Prakash
-
-    Ticket costs still remain
-    individually tracked.
-  */
-
-  const familyMembers=[
-    "rahul",
-    "dhara",
-    "dugu1",
-    "dugu2"
-  ];
-
-  const individualMembers=[
-    "naren",
-    "parul",
-    "prakash"
-  ];
-
-
-  const familyPaid=
-    familyMembers.reduce(
-      (sum,id)=>
-        sum+
-        (totals.payments[id]||0),
-      0
-    );
-
-
-  /*
-    Family share includes the complete
-    cost of Rahul + Dhara + children.
-
-    So each family unit gets one equal
-    settlement share.
-  */
-
-  const numberOfUnits=4;
-
-  const share=
-    totals.overall/
-    numberOfUnits;
-
-
-  let rows="";
-
-
-  rows+=renderSettlementRow(
-    "Rahul + Dhara + Dugu1 + Dugu2",
-    familyPaid,
-    share
-  );
-
-
-  individualMembers.forEach(id=>{
-
-    const person=
-      PEOPLE.find(
-        p=>p.id===id
-      );
-
-    rows+=renderSettlementRow(
-      person.name,
-      totals.payments[id]||0,
-      share
-    );
-
-  });
-
-
-  document.getElementById(
-    "settlementSummary"
-  ).innerHTML=rows;
-
-}
-
-
-function renderSettlementRow(
-  name,
-  paid,
-  share
-){
-
-  const balance=
-    paid-share;
-
-  let result="";
-
-
-  if(
-    Math.abs(balance)<0.005
-  ){
-
-    result=`
-      <span style="
-        color:var(--green);
-        font-weight:bold;
-      ">
-        Settled
-      </span>
-    `;
-
-  }else if(balance>0){
-
-    result=`
-      <span style="
-        color:var(--green);
-        font-weight:bold;
-      ">
-        Gets ${currency(balance)}
-      </span>
-    `;
-
-  }else{
-
-    result=`
-      <span style="
-        color:var(--red);
-        font-weight:bold;
-      ">
-        Pays ${currency(
-          Math.abs(balance)
-        )}
-      </span>
-    `;
-
-  }
-
-
-  return `
-
-    <tr>
-
-      <td>
-        ${escapeHtml(name)}
-      </td>
-
-      <td>
-        ${currency(paid)}
-      </td>
-
-      <td>
-        ${currency(share)}
-      </td>
-
-      <td>
-        ${result}
-      </td>
-
-    </tr>
-
-  `;
-
-}
-
-
-/* =====================================================
-   EXPORT
-===================================================== */
-
-function exportData(){
-
-  const backup={
-
-    app:
-      "Rajasthan Trip Expense & Sightseeing Tracker",
-
-    version:DATA_VERSION,
-
-    exportedAt:
-      new Date().toISOString(),
-
-    people:data.people,
-
-    days:data.days
-
-  };
-
-
-  const json=
-    JSON.stringify(
-      backup,
-      null,
-      2
-    );
-
-
-  const blob=
-    new Blob(
-      [json],
+  </div>
+
+  <script>
+    /* =========================================================
+       GOOGLE SHEETS CONFIGURATION
+       1) Deploy Code.gs as Web App.
+       2) Copy the Web App URL below.
+       ========================================================= */
+    const API_URL = "https://script.google.com/macros/s/AKfycbxxKO4SuzWLwOuDoegJYZm-QsxebNYLMHfMZPP31X18khvzWSzNkEf7ANAhs6XMWA-j9w/exec";
+    const DATA_VERSION = 3;
+
+    const PEOPLE = [
+      { id: "rahul", name: "Rahul", family: "rahul-dhara" },
+      { id: "dhara", name: "Dhara", family: "rahul-dhara" },
+      { id: "dugu1", name: "Dugu1 (2Y)", family: "rahul-dhara", childOf: ["rahul", "dhara"] },
+      { id: "dugu2", name: "Dugu2 (3Y)", family: "rahul-dhara", childOf: ["rahul", "dhara"] },
+      { id: "naren", name: "Naren", family: "naren" },
+      { id: "parul", name: "Parul", family: "parul" },
+      { id: "prakash", name: "Prakash", family: "prakash" }
+    ];
+
+    const INITIAL_DAYS = [
       {
-        type:"application/json"
-      }
-    );
+        id: "day-1", name: "Day 1", places: [
+          ["city-palace", "City Palace", 400, 400, 0, 0, 400, 400, 400],
+          ["jagdish-temple", "Jagdish Temple", 0, 0, 0, 0, 0, 0, 0],
+          ["lake-pichola-boat", "Lake Pichola / Boat", 400, 400, 0, 0, 400, 400, 400],
+          ["jag-mandir", "Jag Mandir", 600, 600, 0, 0, 600, 600, 600],
+          ["bagore-ki-haveli", "Bagore Ki Haveli", 60, 60, 0, 0, 60, 60, 60],
+          ["gangaur-ghat", "Gangaur Ghat", 0, 0, 0, 0, 0, 0, 0],
+          ["ambrai-ghat", "Ambrai Ghat", 0, 0, 0, 0, 0, 0, 0]
+        ]
+      },
+      {
+        id: "day-2", name: "Day 2", places: [
+          ["bahubali-hills", "Bahubali Hills", 0, 0, 0, 0, 0, 0, 0],
+          ["badi-lake", "Badi Lake", 0, 0, 0, 0, 0, 0, 0],
+          ["saheliyon-ki-bari", "Saheliyon Ki Bari", 10, 10, 0, 0, 10, 10, 10],
+          ["fateh-sagar", "Fateh Sagar", 0, 0, 0, 0, 0, 0, 0],
+          ["sajjangarh-fort", "Sajjangarh Fort", 30, 30, 0, 0, 30, 30, 30],
+          ["doodh-talai", "Doodh Talai", 0, 0, 0, 0, 0, 0, 0],
+          ["karni-mata-ropeway", "Karni Mata Ropeway", 117, 117, 0, 55, 117, 117, 117],
+          ["hathi-pol", "Hathi Pol", 0, 0, 0, 0, 0, 0, 0]
+        ]
+      },
+      {
+        id: "day-3", name: "Day 3", places: [
+          ["udaipur-chittorgarh", "Udaipur → Chittorgarh", 0, 0, 0, 0, 0, 0, 0],
+          ["chittorgarh-fort", "Chittorgarh Fort", 40, 40, 0, 0, 40, 40, 40],
+          ["rana-kumbha-palace", "Rana Kumbha Palace", 0, 0, 0, 0, 0, 0, 0],
+          ["vijay-stambh", "Vijay Stambh", 0, 0, 0, 0, 0, 0, 0],
+          ["meera-temple", "Meera Temple", 0, 0, 0, 0, 0, 0, 0],
+          ["kirti-stambh", "Kirti Stambh", 0, 0, 0, 0, 0, 0, 0],
+          ["padmini-palace", "Padmini Palace", 0, 0, 0, 0, 0, 0, 0],
+          ["kalika-mata-temple", "Kalika Mata Temple", 0, 0, 0, 0, 0, 0, 0],
+          ["gaumukh", "Gaumukh", 0, 0, 0, 0, 0, 0, 0],
+          ["chittorgarh-udaipur", "Chittorgarh → Udaipur", 0, 0, 0, 0, 0, 0, 0]
+        ]
+      }];
 
+    let data = null;
+    let syncing = false;
 
-  const url=
-    URL.createObjectURL(
-      blob
-    );
+    function uid(prefix = "id") { return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9) }
+    function currency(v) { return "₹" + Number(v || 0).toLocaleString("en-IN") }
+    function escapeHtml(v) { return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") }
+    function capitalize(v) { return v.charAt(0).toUpperCase() + v.slice(1) }
 
-
-  const link=
-    document.createElement("a");
-
-
-  link.href=url;
-
-
-  link.download=
-    "rajasthan-trip-backup-"+
-
-    new Date()
-      .toISOString()
-      .slice(0,10)+
-
-    ".json";
-
-
-  document.body.appendChild(
-    link
-  );
-
-  link.click();
-
-  link.remove();
-
-  URL.revokeObjectURL(
-    url
-  );
-
-}
-
-
-/* =====================================================
-   IMPORT
-===================================================== */
-
-function importData(event){
-
-  const file=
-    event.target.files[0];
-
-  if(!file)return;
-
-
-  const reader=
-    new FileReader();
-
-
-  reader.onload=function(e){
-
-    try{
-
-      const imported=
-        JSON.parse(
-          e.target.result
-        );
-
-
-      if(
-        !imported ||
-        !Array.isArray(
-          imported.days
-        )
-      ){
-
-        throw new Error(
-          "Invalid backup"
-        );
-
-      }
-
-
-      if(
-        !Array.isArray(
-          imported.people
-        )
-      ){
-
-        throw new Error(
-          "Invalid people"
-        );
-
-      }
-
-
-      if(
-        !confirm(
-          "Import this backup?\n\n"+
-          "Current trip data will be replaced."
-        )
-      ){
-
-        return;
-
-      }
-
-
-      data={
-
-        version:DATA_VERSION,
-
-        people:PEOPLE.map(
-          person=>{
-
-            const importedPerson=
-              imported.people.find(
-                p=>p.id===person.id
-              );
-
-            return {
-              ...person,
-              ...(importedPerson||{})
-            };
-
-          }
-        ),
-
-        days:imported.days
-
+    function makeInitialData() {
+      return {
+        version: DATA_VERSION, people: PEOPLE.map(p => ({ ...p })), days: INITIAL_DAYS.map(day => ({
+          id: day.id, name: day.name, places: day.places.map(p => {
+            const costs = {}; PEOPLE.forEach((person, i) => costs[person.id] = Number(p[i + 2] || 0));
+            return { id: uid("place"), sourceKey: p[0], original: true, name: p[1], costs, visited: false, paidBy: "Not Paid" };
+          })
+        }))
       };
-
-
-      normalizeImportedData();
-
-
-      /*
-        Imported backups should be preserved
-        exactly as user data.
-
-        We don't automatically remove places
-        from an imported backup.
-      */
-
-      data.version=
-        DATA_VERSION;
-
-
-      saveWithStatus();
-
-      render();
-
-
-      alert(
-        "Backup imported successfully."
-      );
-
-
-    }catch(error){
-
-      console.error(error);
-
-      alert(
-        "Import failed. Please select a valid JSON backup."
-      );
-
-    }finally{
-
-      event.target.value="";
-
     }
 
-  };
+    function normalizeData() {
+      if (!data || !Array.isArray(data.days)) data = makeInitialData();
+      data.days.forEach(day => {
+        if (!day.id) day.id = uid("day");
+        if (!Array.isArray(day.places)) day.places = [];
+        day.places.forEach(place => {
+          if (!place.id) place.id = uid("place");
+          if (!place.costs) place.costs = {};
+          PEOPLE.forEach(p => place.costs[p.id] = Math.max(0, Number(place.costs[p.id]) || 0));
+          place.visited = Boolean(place.visited);
+          if (!PEOPLE.some(p => p.id === place.paidBy)) place.paidBy = "Not Paid";
+        });
+      });
+      data.people = PEOPLE.map(p => ({ ...p }));
+    }
 
+    function setStatus(text, color) {
+      const el = document.getElementById("saveStatus"); if (el) { el.textContent = text; el.style.color = color || "var(--green)" }
+    }
 
-  reader.readAsText(file);
+    /* JSONP is used intentionally: Google Apps Script Web Apps can be called
+       from a plain HTML file without a database server or CORS configuration. */
+    function apiCall(action, payload = {}, showSaving = true) {
+      return new Promise((resolve, reject) => {
+        if (!API_URL || API_URL.includes("PASTE_YOUR")) {
+          reject(new Error("Google Apps Script URL is not configured."));
+          return;
+        }
+        if (showSaving) setStatus("Syncing...", "var(--orange)");
+        const cb = "jsonp_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+        const script = document.createElement("script");
+        let done = false;
+        const cleanup = () => { done = true; script.remove(); try { delete window[cb] } catch (e) { } };
+        const timer = setTimeout(() => { cleanup(); reject(new Error("Cloud sync timed out.")) }, 20000);
+        window[cb] = (result) => { clearTimeout(timer); cleanup(); if (result && result.ok) resolve(result); else reject(new Error(result?.error || "Cloud error")) };
+        const params = new URLSearchParams({ action, callback: cb });
+        if (payload && Object.keys(payload).length) params.set("payload", btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+        script.src = API_URL + "?" + params.toString();
+        script.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error("Could not connect to Google Sheets.")) };
+        document.body.appendChild(script);
+      });
+    }
 
-}
-
-
-/* =====================================================
-   RESET
-===================================================== */
-
-function resetTrip(){
-
-  const first=
-    confirm(
-      "Reset the entire trip?\n\n"+
-      "All added sightseeing, edited costs, "+
-      "visited statuses and payment information "+
-      "will be removed."
-    );
-
-
-  if(!first)return;
-
-
-  const second=
-    confirm(
-      "FINAL CONFIRMATION\n\n"+
-      "Restore the current original itinerary "+
-      "and original ticket amounts?"
-    );
-
-
-  if(!second)return;
-
-
-  data=
-    makeInitialData();
-
-
-  saveWithStatus();
-
-  render();
-
-
-  alert(
-    "Trip has been reset successfully."
-  );
-
-}
-
-
-/* =====================================================
-   MODAL
-===================================================== */
-
-function closeModal(){
-
-  document
-    .getElementById(
-      "modalBackdrop"
-    )
-    .classList.remove("open");
-
-}
-
-
-document
-  .getElementById(
-    "modalBackdrop"
-  )
-  .addEventListener(
-    "click",
-    function(event){
-
-      if(
-        event.target===this
-      ){
-
-        closeModal();
-
+    async function refreshFromCloud() {
+      try {
+        setStatus("Loading cloud...", "var(--orange)");
+        const result = await apiCall("read", {}, false);
+        if (result.days && result.days.length) {
+          data = { version: DATA_VERSION, people: PEOPLE.map(p => ({ ...p })), days: result.days };
+          normalizeData(); render();
+          setStatus("Cloud synced", "var(--green)");
+        } else {
+          data = makeInitialData(); normalizeData(); render();
+          await uploadAllInitialData();
+        }
+      } catch (e) {
+        console.error(e);
+        if (!data) { data = makeInitialData(); normalizeData(); render(); }
+        setStatus("Offline / cloud unavailable", "var(--red)");
       }
-
-    }
-  );
-
-
-document.addEventListener(
-  "keydown",
-  function(event){
-
-    if(
-      event.key==="Escape"
-    ){
-
-      closeModal();
-
     }
 
-  }
-);
-
-
-/* =====================================================
-   SAVE BEFORE CLOSE
-===================================================== */
-
-window.addEventListener(
-  "beforeunload",
-  function(){
-
-    if(data){
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(data)
-      );
-
+    async function uploadAllInitialData() {
+      try {
+        setStatus("Uploading initial trip...", "var(--orange)");
+        for (const day of data.days) {
+          await apiCall("saveDay", { day }, false);
+          for (const place of day.places) await apiCall("savePlace", { dayId: day.id, dayName: day.name, place }, false);
+        }
+        setStatus("Cloud synced", "var(--green)");
+      } catch (e) { console.error(e); setStatus("Local changes not synced", "var(--red)") }
     }
 
-  }
-);
+    async function cloudSavePlace(day, place) {
+      try { await apiCall("savePlace", { dayId: day.id, dayName: day.name, place }); setStatus("Saved online", "var(--green)") }
+      catch (e) { console.error(e); setStatus("Changed locally; cloud save failed", "var(--red)") }
+    }
+    async function cloudDeletePlace(dayId, placeId) {
+      try { await apiCall("deletePlace", { dayId, placeId }); setStatus("Deleted online", "var(--green)") }
+      catch (e) { console.error(e); setStatus("Deleted locally; cloud delete failed", "var(--red)") }
+    }
+    async function cloudSaveDay(day) {
+      try { await apiCall("saveDay", { day }); setStatus("Saved online", "var(--green)") }
+      catch (e) { console.error(e); setStatus("Changed locally; cloud save failed", "var(--red)") }
+    }
+    async function cloudReset() {
+      try { await apiCall("reset", {}); await uploadAllInitialData(); } catch (e) { console.error(e); setStatus("Reset locally; cloud reset failed", "var(--red)") }
+    }
 
+    function getPlaceTotal(place) { return PEOPLE.reduce((t, p) => t + Number(place.costs[p.id] || 0), 0) }
+    function getDayTotals(day) {
+      const totals = {}; PEOPLE.forEach(p => totals[p.id] = 0);
+      day.places.forEach(place => PEOPLE.forEach(p => totals[p.id] += Number(place.costs[p.id] || 0)));
+      totals.overall = PEOPLE.reduce((s, p) => s + totals[p.id], 0); return totals;
+    }
+    function calculateTotals() {
+      const totals = { people: {}, payments: {}, overall: 0, locations: 0, visited: 0 };
+      PEOPLE.forEach(p => { totals.people[p.id] = 0; totals.payments[p.id] = 0 }); totals.payments["Not Paid"] = 0;
+      data.days.forEach(day => day.places.forEach(place => {
+        totals.locations++; if (place.visited) totals.visited++;
+        PEOPLE.forEach(p => { const c = Number(place.costs[p.id] || 0); totals.people[p.id] += c; totals.overall += c });
+        const total = getPlaceTotal(place);
+        if (place.paidBy && place.paidBy !== "Not Paid") totals.payments[place.paidBy] += total; else totals.payments["Not Paid"] += total;
+      })); return totals;
+    }
 
-/* =====================================================
-   START
-===================================================== */
+    function render() {
+      if (!data) return;
+      const totals = calculateTotals();
+      document.getElementById("overallTotal").textContent = currency(totals.overall);
+      document.getElementById("locationCount").textContent = totals.locations;
+      document.getElementById("visitedCount").textContent = totals.visited + " / " + totals.locations;
+      document.getElementById("averagePersonCost").textContent = currency(totals.overall / PEOPLE.length);
+      renderDayFilter(); renderDays(); renderPersonTotals(totals); renderPayments(totals); renderSettlement(totals);
+    }
+    function renderDayFilter() {
+      const select = document.getElementById("dayFilter"), current = select.value;
+      select.innerHTML = '<option value="all">All Days</option>' + data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("");
+      if ([...select.options].some(o => o.value === current)) select.value = current;
+    }
+    function renderDays() {
+      const container = document.getElementById("daysContainer"), search = document.getElementById("searchInput").value.trim().toLowerCase(), dayFilter = document.getElementById("dayFilter").value, visitedFilter = document.getElementById("visitedFilter").value;
+      let html = "";
+      data.days.forEach(day => {
+        if (dayFilter !== "all" && day.id !== dayFilter) return;
+        const places = day.places.filter(p => (!search || p.name.toLowerCase().includes(search)) && (visitedFilter === "all" || (visitedFilter === "visited" && p.visited) || (visitedFilter === "notVisited" && !p.visited)));
+        const totals = getDayTotals(day);
+        html += `<section class="day-card"><div class="day-header"><h2>${escapeHtml(day.name)}</h2><div class="day-total">${currency(totals.overall)}</div></div>`;
+        if (places.length) html += `<div class="table-wrap"><table><thead><tr><th>Sightseeing</th>${PEOPLE.map(p => `<th>${escapeHtml(p.name)}</th>`).join("")}<th>Total</th><th>Paid By</th><th>Actions</th></tr></thead><tbody>${places.map(p => renderDesktopPlace(day, p)).join("")}</tbody><tfoot><tr><th>Day Total</th>${PEOPLE.map(p => `<th>${currency(totals[p.id])}</th>`).join("")}<th>${currency(totals.overall)}</th><th></th><th></th></tr></tfoot></table></div>`;
+        else html += `<div class="empty">No sightseeing matches the current filter.</div>`;
+        html += `<div class="mobile-places">${places.length ? places.map(p => renderMobilePlace(day, p)).join("") : `<div class="empty">No sightseeing matches the current filter.</div>`}</div><div class="mobile-day-total"><div class="mobile-day-total-box"><span class="small-label">Places</span><strong>${places.length}</strong></div><div class="mobile-day-total-box"><span class="small-label">Day Total</span><strong>${currency(totals.overall)}</strong></div></div></section>`;
+      });
+      container.innerHTML = html || '<div class="card empty">No days found.</div>';
+    }
+    function renderDesktopPlace(day, place) {
+      return `<tr class="${place.visited ? "visited-row" : ""}"><td><input class="name-input" value="${escapeHtml(place.name)}" onchange="renameSightseeing('${day.id}','${place.id}',this.value)">${place.visited ? '<span class="visited-badge">✓ Visited</span>' : ""}</td>
+${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)"></td>`).join("")}
+<td class="total-cell">${currency(getPlaceTotal(place))}</td><td>${renderPaidSelect(day.id, place.id, place.paidBy, false)}</td>
+<td><div class="actions"><button class="${place.visited ? "btn-green" : ""} btn-small" onclick="toggleVisited('${day.id}','${place.id}')">${place.visited ? "✓ Visited" : "Visited"}</button><button class="btn-danger btn-small" onclick="deleteSightseeing('${day.id}','${place.id}')">Delete</button></div></td></tr>`;
+    }
+    function renderMobilePlace(day, place) {
+      return `<div class="mobile-place ${place.visited ? "visited" : ""}"><div class="mobile-place-header"><input class="mobile-name-input" value="${escapeHtml(place.name)}" onchange="renameSightseeing('${day.id}','${place.id}',this.value)">${place.visited ? '<span class="mobile-visited-label">✓ VISITED</span>' : ""}</div>
+<div class="mobile-cost-section"><div class="mobile-section-label">Ticket Cost</div><div class="mobile-cost-grid">${PEOPLE.map(p => `<div class="mobile-cost-field"><label>${escapeHtml(p.name)}</label><input class="mobile-cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)"></div>`).join("")}</div></div>
+<div class="mobile-place-summary"><div class="mobile-total-box"><span class="small-label">Sightseeing Total</span><div class="mobile-total-value">${currency(getPlaceTotal(place))}</div></div><div class="mobile-paid-box"><span class="small-label">Paid By</span>${renderPaidSelect(day.id, place.id, place.paidBy, true)}</div></div>
+<div class="mobile-actions"><button class="${place.visited ? "btn-green" : "btn-primary"}" onclick="toggleVisited('${day.id}','${place.id}')">${place.visited ? "✓ Visited" : "Mark Visited"}</button><button class="btn-danger" onclick="deleteSightseeing('${day.id}','${place.id}')">Delete</button></div></div>`;
+    }
+    function renderPaidSelect(dayId, placeId, paidBy, mobile) {
+      return `<select class="${mobile ? "mobile-paid-select" : "paid-select"}" onchange="updatePaidBy('${dayId}','${placeId}',this.value)"><option value="Not Paid" ${paidBy === "Not Paid" ? "selected" : ""}>Not Paid</option>${PEOPLE.map(p => `<option value="${p.id}" ${paidBy === p.id ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("")}</select>`;
+    }
 
-loadData();
+    async function updateCost(dayId, placeId, personId, value) {
+      const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
+      place.costs[personId] = Math.max(0, Number(value) || 0); render(); await cloudSavePlace(day, place);
+    }
+    async function renameSightseeing(dayId, placeId, name) {
+      const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
+      const cleaned = String(name).trim(); if (!cleaned) { alert("Sightseeing name cannot be empty."); render(); return }
+      place.name = cleaned; render(); await cloudSavePlace(day, place);
+    }
+    async function updatePaidBy(dayId, placeId, value) {
+      const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
+      place.paidBy = value || "Not Paid"; render(); await cloudSavePlace(day, place);
+    }
+    async function toggleVisited(dayId, placeId) {
+      const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
+      place.visited = !place.visited; render(); await cloudSavePlace(day, place);
+    }
+    async function deleteSightseeing(dayId, placeId) {
+      const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!day || !place) return;
+      if (!confirm(`Delete "${place.name}"?\n\nThis sightseeing and its costs will be removed.`)) return;
+      day.places = day.places.filter(p => p.id !== placeId); render(); await cloudDeletePlace(dayId, placeId);
+    }
 
-render();
+    function openAddSightseeing() {
+      populateDayForm(); document.getElementById("formName").value = "";
+      PEOPLE.forEach(p => document.getElementById("cost" + capitalize(p.id)).value = 0);
+      document.getElementById("modalBackdrop").classList.add("open");
+    }
+    function populateDayForm() { document.getElementById("formDay").innerHTML = data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("") }
+    async function saveSightseeing() {
+      const dayId = document.getElementById("formDay").value, name = document.getElementById("formName").value.trim(); if (!dayId || !name) { alert("Please select a day and enter a sightseeing name."); return }
+      const day = data.days.find(d => d.id === dayId); if (!day) return; const costs = {}; PEOPLE.forEach(p => costs[p.id] = Math.max(0, Number(document.getElementById("cost" + capitalize(p.id)).value) || 0));
+      const place = { id: uid("place"), sourceKey: null, original: false, name, costs, visited: false, paidBy: "Not Paid" }; day.places.push(place); closeModal(); render(); await cloudSavePlace(day, place);
+    }
+    async function addDay() {
+      const name = prompt("Enter the new day name:", `Day ${data.days.length + 1}`); if (name === null) return; const cleaned = name.trim(); if (!cleaned) { alert("Day name cannot be empty."); return }
+      const day = { id: uid("day"), name: cleaned, places: [] }; data.days.push(day); render(); await cloudSaveDay(day);
+    }
 
-</script>
+    function renderPersonTotals(totals) { document.getElementById("personTotals").innerHTML = PEOPLE.map(p => `<div class="card person-card"><div class="label">${escapeHtml(p.name)}</div><div class="value">${currency(totals.people[p.id])}</div></div>`).join("") }
+    function renderPayments(totals) { document.getElementById("paymentSummary").innerHTML = PEOPLE.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") + `<tr><td><strong>Not Paid</strong></td><td><strong>${currency(totals.payments["Not Paid"] || 0)}</strong></td></tr>` }
+    function renderSettlement(totals) {
+      const family = ["rahul", "dhara", "dugu1", "dugu2"], individual = ["naren", "parul", "prakash"], familyPaid = family.reduce((s, id) => s + (totals.payments[id] || 0), 0), share = totals.overall / 4;
+      let rows = renderSettlementRow("Rahul + Dhara + Dugu1 + Dugu2", familyPaid, share); individual.forEach(id => { const p = PEOPLE.find(x => x.id === id); rows += renderSettlementRow(p.name, totals.payments[id] || 0, share) }); document.getElementById("settlementSummary").innerHTML = rows;
+    }
+    function renderSettlementRow(name, paid, share) {
+      const balance = paid - share; let result;
+      if (Math.abs(balance) < .005) result = '<span style="color:var(--green);font-weight:bold">Settled</span>';
+      else if (balance > 0) result = `<span style="color:var(--green);font-weight:bold">Gets ${currency(balance)}</span>`;
+      else result = `<span style="color:var(--red);font-weight:bold">Pays ${currency(Math.abs(balance))}</span>`;
+      return `<tr><td>${escapeHtml(name)}</td><td>${currency(paid)}</td><td>${currency(share)}</td><td>${result}</td></tr>`;
+    }
 
+    function exportData() {
+      const blob = new Blob([JSON.stringify({ app: "Rajasthan Trip Expense & Sightseeing Tracker", version: DATA_VERSION, exportedAt: new Date().toISOString(), people: data.people, days: data.days }, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob), a = document.createElement("a"); a.href = url; a.download = "rajasthan-trip-backup-" + new Date().toISOString().slice(0, 10) + ".json"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+    async function importData(event) {
+      const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const imported = JSON.parse(e.target.result); if (!imported || !Array.isArray(imported.days)) throw new Error("Invalid backup"); if (!confirm("Import this backup?\n\nCurrent cloud trip data will be replaced.")) return;
+          data = { version: DATA_VERSION, people: PEOPLE.map(p => ({ ...p })), days: imported.days }; normalizeData(); render();
+          await apiCall("reset", {}, true); await uploadAllInitialData(); alert("Backup imported and uploaded to Google Sheets.");
+        } catch (err) { console.error(err); alert("Import failed. Please select a valid JSON backup.") } finally { event.target.value = "" }
+      }; reader.readAsText(file);
+    }
+    async function resetTrip() {
+      if (!confirm("Reset the entire trip?\n\nAll added sightseeing, edited costs, visited statuses and payment information will be removed.")) return;
+      if (!confirm("FINAL CONFIRMATION\n\nRestore the current original itinerary and original ticket amounts?")) return;
+      data = makeInitialData(); render(); await cloudReset(); alert("Trip has been reset successfully.");
+    }
+    function closeModal() { document.getElementById("modalBackdrop").classList.remove("open") }
+    document.getElementById("modalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal() });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal() });
+
+    if (API_URL.includes("PASTE_YOUR")) {
+      data = makeInitialData(); normalizeData(); render(); setStatus("Add Apps Script URL", "var(--orange)");
+    } else {
+      refreshFromCloud();
+    }
+  </script>
 </body>
+
 </html>
