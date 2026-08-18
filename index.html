@@ -894,6 +894,30 @@
       flex-shrink: 0
     }
 
+    .confirm-modal-message {
+      margin: 0;
+      white-space: pre-line;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6
+    }
+
+    .confirm-modal-input {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border-color .15s ease, box-shadow .15s ease
+    }
+
+    .confirm-modal-input:focus {
+      outline: none;
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(18, 108, 191, .15)
+    }
+
     .status-note {
       margin-top: 10px;
       padding: 10px;
@@ -1557,6 +1581,23 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="confirmModalBackdrop">
+    <div class="modal-box" style="width:min(420px,100%)">
+      <div class="modal-header">
+        <h3 id="confirmModalTitle">Confirm</h3><button class="close-btn" onclick="resolveConfirmModal(false)">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmModalMessage" class="confirm-modal-message"></p>
+        <input id="confirmModalInput" type="text" class="confirm-modal-input" style="display:none"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();resolveConfirmModal(true)}">
+      </div>
+      <div class="modal-footer">
+        <button id="confirmModalCancelBtn" onclick="resolveConfirmModal(false)">Cancel</button>
+        <button id="confirmModalOkBtn" class="btn-primary" onclick="resolveConfirmModal(true)">OK</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     /* =========================================================
        GOOGLE SHEETS CONFIGURATION
@@ -1806,10 +1847,44 @@
       else if (target === "copy") {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           try { await navigator.clipboard.writeText(SHEET_URL); setStatus("Google Sheet link copied to clipboard!", "var(--green)") }
-          catch (err) { prompt("Copy this link:", SHEET_URL) }
-        } else prompt("Copy this link:", SHEET_URL);
+          catch (err) { await customPrompt("Copy this link:", SHEET_URL) }
+        } else await customPrompt("Copy this link:", SHEET_URL);
       }
       closeShareModal();
+    }
+
+    let confirmModalResolve = null;
+    function openConfirmModal({ title = "Confirm", message = "", okText = "OK", cancelText = "Cancel", danger = false, showCancel = true, inputMode = false, inputValue = "" }) {
+      return new Promise(resolve => {
+        confirmModalResolve = resolve;
+        document.getElementById("confirmModalTitle").textContent = title;
+        document.getElementById("confirmModalMessage").textContent = message;
+        const okBtn = document.getElementById("confirmModalOkBtn");
+        okBtn.textContent = okText;
+        okBtn.className = danger ? "btn-danger" : "btn-primary";
+        const cancelBtn = document.getElementById("confirmModalCancelBtn");
+        cancelBtn.style.display = showCancel ? "" : "none";
+        cancelBtn.textContent = cancelText;
+        const input = document.getElementById("confirmModalInput");
+        input.style.display = inputMode ? "" : "none";
+        input.value = inputValue;
+        document.getElementById("confirmModalBackdrop").classList.add("open");
+        if (inputMode) setTimeout(() => { input.focus(); input.select() }, 60);
+      });
+    }
+    function resolveConfirmModal(confirmed) {
+      document.getElementById("confirmModalBackdrop").classList.remove("open");
+      if (!confirmModalResolve) return;
+      const resolve = confirmModalResolve; confirmModalResolve = null;
+      const input = document.getElementById("confirmModalInput");
+      const isPrompt = input.style.display !== "none";
+      resolve(isPrompt ? (confirmed ? input.value : null) : confirmed);
+    }
+    function customConfirm(message, opts = {}) {
+      return openConfirmModal({ message, danger: opts.danger, okText: opts.okText || "OK", cancelText: opts.cancelText || "Cancel", title: opts.title || "Please Confirm" });
+    }
+    function customPrompt(message, defaultValue = "") {
+      return openConfirmModal({ message, inputMode: true, inputValue: defaultValue, okText: "OK", cancelText: "Cancel", title: "Enter Value" });
     }
 
     async function refreshFromCloud() {
@@ -1980,7 +2055,7 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
     }
     async function renameSightseeing(dayId, placeId, name) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
-      const cleaned = String(name).trim(); if (!cleaned) { alert("Sightseeing name cannot be empty."); render(); return }
+      const cleaned = String(name).trim(); if (!cleaned) { setStatus("Sightseeing name cannot be empty.", "var(--red)"); render(); return }
       place.name = cleaned; render(); await cloudSavePlace(day, place);
     }
     async function toggleVisited(dayId, placeId) {
@@ -1989,7 +2064,7 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
     }
     async function deleteSightseeing(dayId, placeId) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!day || !place) return;
-      if (!confirm(`Delete "${place.name}"?\n\nThis sightseeing and its costs will be removed.`)) return;
+      if (!(await customConfirm(`Delete "${place.name}"?\n\nThis sightseeing and its costs will be removed.`, { danger: true, okText: "Delete", title: "Delete Sightseeing" }))) return;
       day.places = day.places.filter(p => p.id !== placeId); render(); await cloudDeletePlace(dayId, placeId);
     }
 
@@ -2043,7 +2118,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     }
     async function deleteFoodBill(dayId, billId) {
       const day = data.days.find(d => d.id === dayId), bill = day?.foodBills.find(b => b.id === billId); if (!day || !bill) return;
-      if (!confirm(`Delete the food bill at "${bill.restaurantShop}"?\n\nThis entry will be removed.`)) return;
+      if (!(await customConfirm(`Delete the food bill at "${bill.restaurantShop}"?\n\nThis entry will be removed.`, { danger: true, okText: "Delete", title: "Delete Food Bill" }))) return;
       day.foodBills = day.foodBills.filter(b => b.id !== billId); render(); await cloudDeleteFoodBill(dayId, billId);
     }
 
@@ -2089,8 +2164,8 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     }
     async function saveFoodBill() {
       const dayId = document.getElementById("foodFormDay").value, restaurantShop = document.getElementById("foodFormRestaurant").value.trim();
-      if (!restaurantShop) { alert("Please enter a restaurant/shop name."); return }
-      if (!dayId) { alert("No trip day is set up for this date yet."); return }
+      if (!restaurantShop) { setStatus("Please enter a restaurant/shop name.", "var(--red)"); return }
+      if (!dayId) { setStatus("No trip day is set up for this date yet.", "var(--red)"); return }
       const day = data.days.find(d => d.id === dayId); if (!day) return;
       const fields = {
         date: document.getElementById("foodFormDate").value || getDayDateString(dayId),
@@ -2126,12 +2201,12 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     }
     function populateDayForm() { document.getElementById("formDay").innerHTML = data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("") }
     async function saveSightseeing() {
-      const dayId = document.getElementById("formDay").value, name = document.getElementById("formName").value.trim(); if (!dayId || !name) { alert("Please select a day and enter a sightseeing name."); return }
+      const dayId = document.getElementById("formDay").value, name = document.getElementById("formName").value.trim(); if (!dayId || !name) { setStatus("Please select a day and enter a sightseeing name.", "var(--red)"); return }
       const day = data.days.find(d => d.id === dayId); if (!day) return; const costs = {}; PEOPLE.forEach(p => costs[p.id] = Math.max(0, Number(document.getElementById("cost" + capitalize(p.id)).value) || 0));
       const place = { id: uid("place"), sourceKey: null, original: false, name, costs, visited: false, paidBy: "naren" }; day.places.push(place); closeModal(); render(); await cloudSavePlace(day, place);
     }
     async function addDay() {
-      const name = prompt("Enter the new day name:", `Day ${data.days.length + 1}`); if (name === null) return; const cleaned = name.trim(); if (!cleaned) { alert("Day name cannot be empty."); return }
+      const name = await customPrompt("Enter the new day name:", `Day ${data.days.length + 1}`); if (name === null) return; const cleaned = name.trim(); if (!cleaned) { setStatus("Day name cannot be empty.", "var(--red)"); return }
       const day = { id: uid("day"), name: cleaned, places: [] }; data.days.push(day); render(); await cloudSaveDay(day);
     }
 
@@ -2159,20 +2234,21 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     }
 
     async function resetTrip() {
-      if (!confirm("Reset payment data?\n\nAll costs and Paid By selections will be reset to their default values. Sightseeing locations, days, names and visited status will NOT be changed.")) return;
-      if (!confirm("FINAL CONFIRMATION\n\nReset all costs and Paid By selections to their default values?")) return;
+      if (!(await customConfirm("Reset payment data?\n\nAll costs and Paid By selections will be reset to their default values. Sightseeing locations, days, names and visited status will NOT be changed.", { danger: true, okText: "Continue", title: "Reset Payment Data" }))) return;
+      if (!(await customConfirm("FINAL CONFIRMATION\n\nReset all costs and Paid By selections to their default values?", { danger: true, okText: "Reset Everything", title: "Are You Sure?" }))) return;
       data.days.forEach(day => day.places.forEach(place => {
         const original = ORIGINAL_COSTS[place.sourceKey];
         PEOPLE.forEach(p => place.costs[p.id] = original ? Number(original[p.id] || 0) : 0);
         place.paidBy = "naren";
       }));
-      render(); await cloudSaveAllPlaces(); alert("Payment data has been reset successfully.");
+      render(); await cloudSaveAllPlaces(); setStatus("Payment data has been reset successfully.", "var(--green)");
     }
     function closeModal() { document.getElementById("modalBackdrop").classList.remove("open") }
     document.getElementById("modalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal() });
     document.getElementById("foodModalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeFoodModal() });
     document.getElementById("shareModalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeShareModal() });
-    document.addEventListener("keydown", e => { if (e.key === "Escape") { closeModal(); closeFoodModal(); closeShareModal(); closeThemeMenu() } });
+    document.getElementById("confirmModalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) resolveConfirmModal(false) });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") { closeModal(); closeFoodModal(); closeShareModal(); closeThemeMenu(); resolveConfirmModal(false) } });
 
     function populateThemeMenu() {
       const menu = document.getElementById("themeMenu"), current = getSavedThemeId() || "classic-blue";
