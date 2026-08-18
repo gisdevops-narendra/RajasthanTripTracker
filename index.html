@@ -698,8 +698,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 190;
-      pointer-events: none
+      z-index: 190
     }
 
     .sync-overlay.active {
@@ -1149,6 +1148,7 @@
 
     let data = null;
     let syncing = false;
+    let loadingCloud = false;
     let dayFilterAutoApplied = false;
     const expandedPlaces = new Set();
     function togglePlaceExpand(placeId) {
@@ -1263,21 +1263,26 @@
     }
 
     async function refreshFromCloud() {
+      loadingCloud = true; render();
       try {
         setStatus("Loading cloud...", "var(--orange)");
         const result = await apiCall("read", {}, false);
         if (result.days && result.days.length) {
           data = { version: DATA_VERSION, people: PEOPLE.map(p => ({ ...p })), days: result.days };
-          normalizeData(); render();
+          normalizeData();
           setStatus("Cloud synced", "var(--green)");
         } else {
-          data = makeInitialData(); normalizeData(); render();
+          data = makeInitialData(); normalizeData();
+          loadingCloud = false; render();
           await uploadAllInitialData();
+          return;
         }
       } catch (e) {
         console.error(e);
-        if (!data) { data = makeInitialData(); normalizeData(); render(); }
+        if (!data) { data = makeInitialData(); normalizeData(); }
         setStatus("Offline / cloud unavailable", "var(--red)");
+      } finally {
+        loadingCloud = false; render();
       }
     }
 
@@ -1366,23 +1371,24 @@
       container.innerHTML = html || '<div class="card empty">No days found.</div>';
     }
     function renderDesktopPlace(day, place) {
-      return `<tr class="${place.visited ? "visited-row" : ""}"><td><input class="name-input" value="${escapeHtml(place.name)}" onchange="renameSightseeing('${day.id}','${place.id}',this.value)" ${place.visited ? "disabled" : ""}>${place.visited ? '<span class="visited-badge">✓ Visited</span>' : ""}</td>
-${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)" ${place.visited ? "disabled" : ""}></td>`).join("")}
+      const locked = place.visited || loadingCloud;
+      return `<tr class="${place.visited ? "visited-row" : ""}"><td><input class="name-input" value="${escapeHtml(place.name)}" onchange="renameSightseeing('${day.id}','${place.id}',this.value)" ${locked ? "disabled" : ""}>${place.visited ? '<span class="visited-badge">✓ Visited</span>' : ""}</td>
+${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)" ${locked ? "disabled" : ""}></td>`).join("")}
 <td class="total-cell">${currency(getPlaceTotal(place))}</td>
-<td><div class="actions"><button class="${place.visited ? "btn-green" : ""} btn-small" onclick="toggleVisited('${day.id}','${place.id}')">${place.visited ? "✓ Visited" : "Visited"}</button><button class="btn-danger btn-small" onclick="deleteSightseeing('${day.id}','${place.id}')">Delete</button></div></td></tr>`;
+<td><div class="actions"><button class="${place.visited ? "btn-green" : ""} btn-small" onclick="toggleVisited('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>${place.visited ? "✓ Visited" : "Visited"}</button><button class="btn-danger btn-small" onclick="deleteSightseeing('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>Delete</button></div></td></tr>`;
     }
     function renderMobilePlace(day, place) {
-      const expanded = expandedPlaces.has(place.id);
+      const expanded = expandedPlaces.has(place.id), locked = place.visited || loadingCloud;
       return `<div class="mobile-place ${place.visited ? "visited" : ""}">
 <div class="mp-row ${expanded ? "mp-open" : ""}">
-<button class="mp-visited-toggle" onclick="toggleVisited('${day.id}','${place.id}')" title="${place.visited ? "Mark not visited" : "Mark visited"}" aria-label="Toggle visited">${place.visited ? "✅" : "⬜"}</button>
-<input class="mp-name" value="${escapeHtml(place.name)}" onchange="renameSightseeing('${day.id}','${place.id}',this.value)" ${place.visited ? "disabled" : ""}>
+<button class="mp-visited-toggle" onclick="toggleVisited('${day.id}','${place.id}')" title="${place.visited ? "Mark not visited" : "Mark visited"}" aria-label="Toggle visited" ${loadingCloud ? "disabled" : ""}>${place.visited ? "✅" : "⬜"}</button>
+<input class="mp-name" value="${escapeHtml(place.name)}" onchange="renameSightseeing('${day.id}','${place.id}',this.value)" ${locked ? "disabled" : ""}>
 <span class="mp-total">${currency(getPlaceTotal(place))}</span>
 <button class="mp-toggle-btn" onclick="togglePlaceExpand('${place.id}')" aria-expanded="${expanded}" aria-controls="mp-${place.id}">${expanded ? "▲" : "▼"}</button>
 </div>
 <div class="collapse ${expanded ? "show" : ""}" id="mp-${place.id}">
-<div class="mobile-cost-section"><div class="mobile-section-label">Ticket Cost</div><div class="mobile-cost-grid">${PEOPLE.map(p => `<div class="mobile-cost-field"><label>${escapeHtml(p.name)}</label><input class="mobile-cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)" ${place.visited ? "disabled" : ""}></div>`).join("")}</div></div>
-<div class="mobile-actions"><button class="btn-danger" onclick="deleteSightseeing('${day.id}','${place.id}')">Delete Sightseeing</button></div>
+<div class="mobile-cost-section"><div class="mobile-section-label">Ticket Cost</div><div class="mobile-cost-grid">${PEOPLE.map(p => `<div class="mobile-cost-field"><label>${escapeHtml(p.name)}</label><input class="mobile-cost-input" type="number" min="0" value="${Number(place.costs[p.id] || 0)}" onchange="updateCost('${day.id}','${place.id}','${p.id}',this.value)" ${locked ? "disabled" : ""}></div>`).join("")}</div></div>
+<div class="mobile-actions"><button class="btn-danger" onclick="deleteSightseeing('${day.id}','${place.id}')" ${loadingCloud ? "disabled" : ""}>Delete Sightseeing</button></div>
 </div>
 </div>`;
     }
