@@ -1073,8 +1073,6 @@
           <div class="family-row">
             <div class="family-person">Rahul</div>
             <div class="family-person">Dhara</div>
-            <div class="family-person">Dugu1 (2Y) <span class="child-tag">Child of Rahul & Dhara</span></div>
-            <div class="family-person">Dugu2 (3Y) <span class="child-tag">Child of Rahul & Dhara</span></div>
           </div>
         </div>
       </details>
@@ -1112,8 +1110,8 @@
               <tbody id="settlementSummary"></tbody>
             </table>
           </div>
-          <div class="status-note">Settlement groups Rahul, Dhara, Dugu1 and Dugu2 as one family unit. The children remain
-            separate everywhere else.</div>
+          <div class="status-note">Settlement groups Rahul and Dhara (with Dugu1 &amp; Dugu2's costs) as one family unit.
+            The children only appear individually in the sightseeing ticket cost breakdown.</div>
         </div>
       </details>
     </div>
@@ -1182,8 +1180,8 @@
               <tbody id="foodSettlementSummary"></tbody>
             </table>
           </div>
-          <div class="status-note">Settlement groups Rahul, Dhara, Dugu1 and Dugu2 as one family unit. The children remain
-            separate everywhere else.</div>
+          <div class="status-note">Settlement groups Rahul and Dhara (with Dugu1 &amp; Dugu2's costs) as one family unit.
+            The children only appear individually in the sightseeing ticket cost breakdown.</div>
         </div>
       </details>
     </div>
@@ -1315,7 +1313,9 @@
           ["gaumukh", "Gaumukh", 0, 0, 0, 0, 0, 0, 0],
           ["chittorgarh-udaipur", "Chittorgarh → Udaipur", 0, 0, 0, 0, 0, 0, 0]
         ]
-      }];
+      },
+      { id: "day-4", name: "Day 4", places: [] },
+      { id: "day-5", name: "Day 5", places: [] }];
 
     const ORIGINAL_COSTS = (() => {
       const map = {};
@@ -1345,7 +1345,7 @@
     }
 
     const TRIP_START_DATE = new Date(2026, 7, 29); // 29 Aug 2026 = Day 1
-    const TRIP_DAY_COUNT = 3; // 29 Aug, 30 Aug, 31 Aug 2026
+    const TRIP_DAY_COUNT = 5; // 29 Aug - 2 Sept 2026
 
     function uid(prefix = "id") { return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9) }
     function currency(v) { return "₹" + Number(v || 0).toLocaleString("en-IN") }
@@ -1391,6 +1391,19 @@
 
     function normalizeData() {
       if (!data || !Array.isArray(data.days)) data = makeInitialData();
+      const existingIds = new Set(data.days.map(d => d.id));
+      const addedDays = [];
+      INITIAL_DAYS.forEach(initDay => {
+        if (existingIds.has(initDay.id)) return;
+        const newDay = {
+          id: initDay.id, name: initDay.name, foodBills: [], places: initDay.places.map(p => {
+            const costs = {}; PEOPLE.forEach((person, i) => costs[person.id] = Number(p[i + 2] || 0));
+            return { id: uid("place"), sourceKey: p[0], original: true, name: p[1], costs, visited: false, paidBy: "naren" };
+          })
+        };
+        data.days.push(newDay);
+        addedDays.push(newDay);
+      });
       data.days.forEach(day => {
         if (!day.id) day.id = uid("day");
         if (!Array.isArray(day.places)) day.places = [];
@@ -1416,6 +1429,7 @@
         });
       });
       data.people = PEOPLE.map(p => ({ ...p }));
+      return addedDays;
     }
 
     function setStatus(text, color) {
@@ -1480,8 +1494,9 @@
         const result = await apiCall("read", {}, false);
         if (result.days && result.days.length) {
           data = { version: DATA_VERSION, people: PEOPLE.map(p => ({ ...p })), days: result.days };
-          normalizeData();
+          const addedDays = normalizeData();
           setStatus("Cloud synced", "var(--green)");
+          if (addedDays.length) { loadingCloud = false; render(); for (const day of addedDays) await cloudSaveDay(day); }
         } else {
           data = makeInitialData(); normalizeData();
           loadingCloud = false; render();
@@ -1722,7 +1737,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       document.getElementById("foodFormCategory").value = "lunch";
       document.getElementById("foodFormStatus").value = "paid";
       document.getElementById("foodFormNotes").value = "";
-      document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.map(p => `<option value="${p.id}" ${p.id === "parul" ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
+      document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<option value="${p.id}" ${p.id === "parul" ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
       document.getElementById("foodFormDate").value = getDayDateString(document.getElementById("foodFormDay").value);
       document.getElementById("foodModalBackdrop").classList.add("open");
     }
@@ -1741,7 +1756,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       document.getElementById("foodFormCategory").value = bill.category;
       document.getElementById("foodFormStatus").value = bill.paymentStatus;
       document.getElementById("foodFormNotes").value = bill.notes || "";
-      document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.map(p => `<option value="${p.id}" ${p.id === bill.paidBy ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
+      document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<option value="${p.id}" ${p.id === bill.paidBy ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
       document.getElementById("foodModalBackdrop").classList.add("open");
     }
     function populateFoodDayForm() {
@@ -1775,10 +1790,10 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     }
     function closeFoodModal() { document.getElementById("foodModalBackdrop").classList.remove("open"); editingFoodBill = null }
 
-    function renderFoodPayments(totals) { document.getElementById("foodPaymentSummary").innerHTML = PEOPLE.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
+    function renderFoodPayments(totals) { document.getElementById("foodPaymentSummary").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
     function renderFoodSettlement(totals) {
       const family = ["rahul", "dhara", "dugu1", "dugu2"], individual = ["naren", "parul", "prakash"], familyPaid = family.reduce((s, id) => s + (totals.payments[id] || 0), 0), share = totals.overall / 4;
-      let rows = renderSettlementRow("Rahul + Dhara + Dugu1 + Dugu2", familyPaid, share); individual.forEach(id => { const p = PEOPLE.find(x => x.id === id); rows += renderSettlementRow(p.name, totals.payments[id] || 0, share) }); document.getElementById("foodSettlementSummary").innerHTML = rows;
+      let rows = renderSettlementRow("Rahul + Dhara", familyPaid, share); individual.forEach(id => { const p = PEOPLE.find(x => x.id === id); rows += renderSettlementRow(p.name, totals.payments[id] || 0, share) }); document.getElementById("foodSettlementSummary").innerHTML = rows;
     }
 
     function openAddSightseeing() {
@@ -1797,11 +1812,20 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       const day = { id: uid("day"), name: cleaned, places: [] }; data.days.push(day); render(); await cloudSaveDay(day);
     }
 
-    function renderPersonTotals(totals) { document.getElementById("personTotals").innerHTML = PEOPLE.map(p => `<div class="card person-card"><div class="label">${escapeHtml(p.name)}</div><div class="value">${currency(totals.people[p.id])}</div></div>`).join("") }
-    function renderPayments(totals) { document.getElementById("paymentSummary").innerHTML = PEOPLE.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
+    function getDisplayPersonTotal(totals, personId) {
+      let total = totals.people[personId] || 0;
+      PEOPLE.forEach(p => { if (p.childOf && p.childOf.includes(personId)) total += (totals.people[p.id] || 0) / p.childOf.length });
+      return total;
+    }
+    function renderPersonTotals(totals) { document.getElementById("personTotals").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<div class="card person-card"><div class="label">${escapeHtml(p.name)}</div><div class="value">${currency(getDisplayPersonTotal(totals, p.id))}</div></div>`).join("") }
+    function renderPayments(totals) { document.getElementById("paymentSummary").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
     function renderSettlement(totals) {
-      const family = ["rahul", "dhara", "dugu1", "dugu2"], individual = ["naren", "parul", "prakash"], familyPaid = family.reduce((s, id) => s + (totals.payments[id] || 0), 0), share = totals.overall / 4;
-      let rows = renderSettlementRow("Rahul + Dhara + Dugu1 + Dugu2", familyPaid, share); individual.forEach(id => { const p = PEOPLE.find(x => x.id === id); rows += renderSettlementRow(p.name, totals.payments[id] || 0, share) }); document.getElementById("settlementSummary").innerHTML = rows;
+      const family = ["rahul", "dhara", "dugu1", "dugu2"], individual = ["naren", "parul", "prakash"];
+      const familyPaid = family.reduce((s, id) => s + (totals.payments[id] || 0), 0);
+      const familyShare = family.reduce((s, id) => s + (totals.people[id] || 0), 0);
+      let rows = renderSettlementRow("Rahul + Dhara", familyPaid, familyShare);
+      individual.forEach(id => { const p = PEOPLE.find(x => x.id === id); rows += renderSettlementRow(p.name, totals.payments[id] || 0, totals.people[id] || 0) });
+      document.getElementById("settlementSummary").innerHTML = rows;
     }
     function renderSettlementRow(name, paid, share) {
       const balance = paid - share; let result;
