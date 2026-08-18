@@ -12,9 +12,10 @@ HOW TO USE
 8. Copy the Web App URL.
 9. Paste it into API_URL in index.html.
 
-The spreadsheet has two sheets:
+The spreadsheet has three sheets:
   Days
   Places
+  FoodBills
 
 The HTML app uses JSONP GET requests, so you do NOT need
 a database server or CORS configuration.
@@ -22,6 +23,7 @@ a database server or CORS configuration.
 
 const DAYS_SHEET = "Days";
 const PLACES_SHEET = "Places";
+const FOOD_BILLS_SHEET = "FoodBills";
 
 const PEOPLE_IDS = [
   "rahul","dhara","dugu1","dugu2","naren","parul","prakash"
@@ -52,6 +54,14 @@ function doGet(e) {
 
       case "deletePlace":
         result = deletePlace(payload.dayId, payload.placeId);
+        break;
+
+      case "saveFoodBill":
+        result = saveFoodBill(payload.dayId, payload.dayName, payload.bill);
+        break;
+
+      case "deleteFoodBill":
+        result = deleteFoodBill(payload.dayId, payload.billId);
         break;
 
       case "reset":
@@ -109,16 +119,27 @@ function setupSheets() {
     ]);
   }
 
-  return {days, places};
+  let foodBills = ss.getSheetByName(FOOD_BILLS_SHEET);
+  if (!foodBills) {
+    foodBills = ss.insertSheet(FOOD_BILLS_SHEET);
+    foodBills.appendRow([
+      "dayId","dayName","billId","date","restaurantShop","food",
+      "category","amount","paidBy","paymentStatus","notes"
+    ]);
+  }
+
+  return {days, places, foodBills};
 }
 
 function readAll() {
   const sheets = setupSheets();
   const daysSheet = sheets.days;
   const placesSheet = sheets.places;
+  const foodBillsSheet = sheets.foodBills;
 
   const daysValues = daysSheet.getDataRange().getValues();
   const placesValues = placesSheet.getDataRange().getValues();
+  const foodBillsValues = foodBillsSheet.getDataRange().getValues();
 
   const days = [];
 
@@ -129,7 +150,8 @@ function readAll() {
     days.push({
       id: String(row[0]),
       name: String(row[1] || "Day"),
-      places: []
+      places: [],
+      foodBills: []
     });
   }
 
@@ -146,12 +168,32 @@ function readAll() {
       dayMap[place.dayId] = {
         id: place.dayId,
         name: place.dayName || "Day",
-        places: []
+        places: [],
+        foodBills: []
       };
       days.push(dayMap[place.dayId]);
     }
 
     dayMap[place.dayId].places.push(place);
+  }
+
+  for (let i = 1; i < foodBillsValues.length; i++) {
+    const row = foodBillsValues[i];
+    if (!row[0] || !row[2]) continue;
+
+    const bill = rowToFoodBill(row);
+
+    if (!dayMap[bill.dayId]) {
+      dayMap[bill.dayId] = {
+        id: bill.dayId,
+        name: bill.dayName || "Day",
+        places: [],
+        foodBills: []
+      };
+      days.push(dayMap[bill.dayId]);
+    }
+
+    dayMap[bill.dayId].foodBills.push(bill);
   }
 
   return {days};
@@ -175,6 +217,30 @@ function rowToPlace(row) {
     dayId: String(row[0]),
     dayName: String(row[1] || "Day")
   };
+}
+
+function rowToFoodBill(row) {
+  return {
+    id: String(row[2]),
+    date: formatDateCell(row[3]),
+    restaurantShop: String(row[4] || ""),
+    food: String(row[5] || ""),
+    category: row[6] ? String(row[6]) : "lunch",
+    amount: Number(row[7]) || 0,
+    paidBy: row[8] ? String(row[8]) : "parul",
+    paymentStatus: row[9] ? String(row[9]) : "paid",
+    notes: String(row[10] || ""),
+    dayId: String(row[0]),
+    dayName: String(row[1] || "Day")
+  };
+}
+
+function formatDateCell(value) {
+  if (!value) return "";
+  if (Object.prototype.toString.call(value) === "[object Date]") {
+    return Utilities.formatDate(value, Session.getScriptTimeZone() || "Etc/UTC", "yyyy-MM-dd");
+  }
+  return String(value);
 }
 
 function saveDay(day) {
@@ -251,11 +317,76 @@ function deletePlace(dayId, placeId) {
   return {message:"Place not found"};
 }
 
+function saveFoodBill(dayId, dayName, bill) {
+  if (!dayId || !bill || !bill.id) {
+    throw new Error("Invalid food bill");
+  }
+
+  const sheets = setupSheets();
+  const sheet = sheets.foodBills;
+  const values = sheet.getDataRange().getValues();
+
+  const row = [
+    dayId,
+    dayName || "Day",
+    bill.id,
+    bill.date || "",
+    bill.restaurantShop || "",
+    bill.food || "",
+    bill.category || "lunch",
+    Number(bill.amount) || 0,
+    bill.paidBy || "parul",
+    bill.paymentStatus || "paid",
+    bill.notes || ""
+  ];
+
+  let targetRow = -1;
+  for (let i = 1; i < values.length; i++) {
+    if (String(values[i][0]) === String(dayId) &&
+        String(values[i][2]) === String(bill.id)) {
+      targetRow = i + 1;
+      break;
+    }
+  }
+
+  const isUpdate = targetRow !== -1;
+  if (isUpdate) {
+    sheet.getRange(targetRow, 1, 1, row.length).setValues([row]);
+  } else {
+    sheet.appendRow(row);
+    targetRow = sheet.getLastRow();
+  }
+
+  // Keep the date column as plain text so Sheets doesn't reinterpret "yyyy-MM-dd" as a serial date.
+  sheet.getRange(targetRow, 4).setNumberFormat("@").setValue(row[3]);
+
+  return {message: isUpdate ? "Food bill updated" : "Food bill saved"};
+}
+
+function deleteFoodBill(dayId, billId) {
+  if (!dayId || !billId) throw new Error("Invalid food bill");
+
+  const sheets = setupSheets();
+  const sheet = sheets.foodBills;
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = values.length - 1; i >= 1; i--) {
+    if (String(values[i][0]) === String(dayId) &&
+        String(values[i][2]) === String(billId)) {
+      sheet.deleteRow(i + 1);
+      return {message:"Food bill deleted"};
+    }
+  }
+
+  return {message:"Food bill not found"};
+}
+
 function resetAll() {
   const sheets = setupSheets();
 
   clearDataSheet(sheets.days, 2);
   clearDataSheet(sheets.places, 2);
+  clearDataSheet(sheets.foodBills, 2);
 
   return {message:"Trip data cleared"};
 }
