@@ -1035,11 +1035,22 @@
 
     let data = null;
     let syncing = false;
+    let dayFilterAutoApplied = false;
+
+    const TRIP_START_DATE = new Date(2026, 7, 30); // 30 Aug 2026 = Day 1
+    const TRIP_DAY_COUNT = 3; // 30 Aug, 31 Aug, 1 Sep 2026
 
     function uid(prefix = "id") { return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9) }
     function currency(v) { return "₹" + Number(v || 0).toLocaleString("en-IN") }
     function escapeHtml(v) { return String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") }
     function capitalize(v) { return v.charAt(0).toUpperCase() + v.slice(1) }
+
+    function getAutoDayId() {
+      const today = new Date(); const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const offset = Math.round((todayMidnight - TRIP_START_DATE) / 86400000);
+      if (offset < 0 || offset >= TRIP_DAY_COUNT) return "all";
+      return data.days[offset] ? data.days[offset].id : "all";
+    }
 
     function makeInitialData() {
       return {
@@ -1174,6 +1185,11 @@
     function renderDayFilter() {
       const select = document.getElementById("dayFilter"), current = select.value;
       select.innerHTML = '<option value="all">All Days</option>' + data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("");
+      if (!dayFilterAutoApplied) {
+        dayFilterAutoApplied = true;
+        const autoId = getAutoDayId();
+        if ([...select.options].some(o => o.value === autoId)) { select.value = autoId; return; }
+      }
       if ([...select.options].some(o => o.value === current)) select.value = current;
     }
     function renderDays() {
