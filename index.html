@@ -852,6 +852,7 @@
         <button class="btn-primary" onclick="openAddSightseeing()">+ Add Sightseeing</button>
         <button class="btn-primary" onclick="addDay()">+ Add Day</button>
         <button onclick="refreshFromCloud()">↻ Refresh</button>
+        <button onclick="viewGoogleSheet()">📄 View Google Sheet</button>
         <button onclick="exportData()">Export Backup</button>
         <button onclick="document.getElementById('importFile').click()">Import Backup</button>
         <button class="btn-danger" onclick="resetTrip()">Reset Trip</button>
@@ -980,6 +981,7 @@
        2) Copy the Web App URL below.
        ========================================================= */
     const API_URL = "https://script.google.com/macros/s/AKfycbxxKO4SuzWLwOuDoegJYZm-QsxebNYLMHfMZPP31X18khvzWSzNkEf7ANAhs6XMWA-j9w/exec";
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/1EFoexe8aYvB9VDAFQdZf72NiMM5P2z_naKHjDBzqwEo/edit?usp=sharing";
     const DATA_VERSION = 3;
 
     const PEOPLE = [
@@ -1091,6 +1093,10 @@
         script.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error("Could not connect to Google Sheets.")) };
         document.body.appendChild(script);
       });
+    }
+
+    function viewGoogleSheet() {
+      window.open(SHEET_URL, "_blank", "noopener");
     }
 
     async function refreshFromCloud() {
