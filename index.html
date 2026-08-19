@@ -1411,11 +1411,11 @@
       </section>
 
       <div class="toolbar">
-        <input id="searchInput" type="search" placeholder="Search sightseeing..." oninput="render()">
-        <select id="dayFilter" onchange="render()">
+        <input id="searchInput" type="search" placeholder="Search sightseeing..." oninput="renderSightseeing()">
+        <select id="dayFilter" onchange="renderSightseeing()">
           <option value="all">All Days</option>
         </select>
-        <select id="visitedFilter" onchange="render()">
+        <select id="visitedFilter" onchange="renderSightseeing()">
           <option value="all">All Status</option>
           <option value="visited">Visited</option>
           <option value="notVisited">Not Visited</option>
@@ -1491,8 +1491,8 @@
       </section>
 
       <div class="toolbar">
-        <input id="foodSearchInput" type="search" placeholder="Search restaurant, food, notes..." oninput="render()">
-        <select id="foodDayFilter" onchange="render()">
+        <input id="foodSearchInput" type="search" placeholder="Search restaurant, food, notes..." oninput="renderFood()">
+        <select id="foodDayFilter" onchange="renderFood()">
           <option value="all">All Days</option>
         </select>
       </div>
@@ -1642,7 +1642,7 @@
        1) Deploy Code.gs as Web App.
        2) Copy the Web App URL below.
        ========================================================= */
-    const API_URL = "https://script.google.com/macros/s/AKfycbz2cohbicyo55u__dcsla2NArAKEVH20rbGV9XZrQK40jypHJzIp5tXGugim7HxH6Y7bQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbx3R8BG5Uv6slIKTuH9Ln0y-TRTW6hLj4Tgr-POHsG2rkGax64qu-_12RDyCq14bDamTw/exec";
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/1EFoexe8aYvB9VDAFQdZf72NiMM5P2z_naKHjDBzqwEo/edit?usp=sharing";
     const DATA_VERSION = 4;
 
@@ -1714,7 +1714,7 @@
     const expandedPlaces = new Set();
     function togglePlaceExpand(placeId) {
       if (expandedPlaces.has(placeId)) expandedPlaces.delete(placeId); else expandedPlaces.add(placeId);
-      render();
+      renderSightseeing();
     }
     function switchTab(tab) {
       if (activeTab !== tab) { closeModal(); closeFoodModal() }
@@ -2025,11 +2025,7 @@
     async function uploadAllInitialData() {
       try {
         setStatus("Uploading initial trip...", "var(--orange)");
-        for (const day of data.days) {
-          await apiCall("saveDay", { day }, false);
-          for (const place of day.places) await apiCall("savePlace", { dayId: day.id, dayName: day.name, place }, false);
-          for (const bill of day.foodBills) await apiCall("saveFoodBill", { dayId: day.id, dayName: day.name, bill }, false);
-        }
+        await apiCall("bulkSaveAll", { days: data.days }, false);
         setStatus("Cloud synced", "var(--green)");
       } catch (e) { console.error(e); setStatus("Local changes not synced", "var(--red)") }
     }
@@ -2060,7 +2056,7 @@
     async function cloudSaveAllPlaces() {
       try {
         setStatus("Saving reset...", "var(--orange)");
-        for (const day of data.days) for (const place of day.places) await apiCall("savePlace", { dayId: day.id, dayName: day.name, place }, false);
+        await apiCall("bulkSavePlaces", { days: data.days }, false);
         setStatus("Cloud synced", "var(--green)");
       } catch (e) { console.error(e); setStatus("Reset locally; cloud save failed", "var(--red)") }
     }
@@ -2094,7 +2090,13 @@
       return totals;
     }
 
-    function render() {
+    // render() refreshes both tabs (used after data reloads / cross-tab changes like
+    // adding a day). Interactions scoped to a single tab call renderSightseeing()/
+    // renderFood() directly so typing in one tab's search box doesn't rebuild the
+    // other, hidden tab's DOM on every keystroke.
+    function render() { renderSightseeing(); renderFood(); }
+
+    function renderSightseeing() {
       if (!data) return;
       const totals = calculateTotals();
       document.getElementById("overallTotal").textContent = currency(totals.overall);
@@ -2102,7 +2104,10 @@
       document.getElementById("visitedCount").textContent = totals.visited + " / " + totals.locations;
       document.getElementById("averagePersonCost").textContent = currency(totals.overall / PEOPLE.length);
       renderDayFilter(); renderDays(); renderPersonTotals(totals); renderPayments(totals); renderSettlement(totals);
+    }
 
+    function renderFood() {
+      if (!data) return;
       const foodTotals = calculateFoodTotals();
       document.getElementById("foodOverallTotal").textContent = currency(foodTotals.overall);
       document.getElementById("foodBillCount").textContent = foodTotals.count;
@@ -2111,6 +2116,9 @@
     }
     function renderDayFilter() {
       const select = document.getElementById("dayFilter"), current = select.value;
+      const signature = data.days.map(d => d.id + ":" + d.name).join("|");
+      if (select.dataset.sig === signature) return;
+      select.dataset.sig = signature;
       select.innerHTML = '<option value="all">All Days</option>' + data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("");
       if (!dayFilterAutoApplied) {
         dayFilterAutoApplied = true;
@@ -2157,7 +2165,7 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
     }
     function updateCost(dayId, placeId, personId, value) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
-      place.costs[personId] = Math.max(0, Number(value) || 0); render();
+      place.costs[personId] = Math.max(0, Number(value) || 0); renderSightseeing();
     }
     async function saveCosts(dayId, placeId) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
@@ -2165,21 +2173,24 @@ ${PEOPLE.map(p => `<td><input class="cost-input" type="number" min="0" value="${
     }
     async function renameSightseeing(dayId, placeId, name) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
-      const cleaned = String(name).trim(); if (!cleaned) { setStatus("Sightseeing name cannot be empty.", "var(--red)"); render(); return }
-      place.name = cleaned; render(); await cloudSavePlace(day, place);
+      const cleaned = String(name).trim(); if (!cleaned) { setStatus("Sightseeing name cannot be empty.", "var(--red)"); renderSightseeing(); return }
+      place.name = cleaned; renderSightseeing(); await cloudSavePlace(day, place);
     }
     async function toggleVisited(dayId, placeId) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!place) return;
-      place.visited = !place.visited; render(); await cloudSavePlace(day, place);
+      place.visited = !place.visited; renderSightseeing(); await cloudSavePlace(day, place);
     }
     async function deleteSightseeing(dayId, placeId) {
       const day = data.days.find(d => d.id === dayId), place = day?.places.find(p => p.id === placeId); if (!day || !place) return;
       if (!(await customConfirm(`Delete "${place.name}"?\n\nThis sightseeing and its costs will be removed.`, { danger: true, okText: "Delete", title: "Delete Sightseeing" }))) return;
-      day.places = day.places.filter(p => p.id !== placeId); render(); await cloudDeletePlace(dayId, placeId);
+      day.places = day.places.filter(p => p.id !== placeId); renderSightseeing(); await cloudDeletePlace(dayId, placeId);
     }
 
     function renderFoodDayFilter() {
       const select = document.getElementById("foodDayFilter"), current = select.value;
+      const signature = data.days.map(d => d.id + ":" + d.name).join("|");
+      if (select.dataset.sig === signature) return;
+      select.dataset.sig = signature;
       select.innerHTML = '<option value="all">All Days</option>' + data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("");
       if ([...select.options].some(o => o.value === current)) select.value = current;
     }
@@ -2229,7 +2240,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     async function deleteFoodBill(dayId, billId) {
       const day = data.days.find(d => d.id === dayId), bill = day?.foodBills.find(b => b.id === billId); if (!day || !bill) return;
       if (!(await customConfirm(`Delete the food bill at "${bill.restaurantShop}"?\n\nThis entry will be removed.`, { danger: true, okText: "Delete", title: "Delete Food Bill" }))) return;
-      day.foodBills = day.foodBills.filter(b => b.id !== billId); render(); await cloudDeleteFoodBill(dayId, billId);
+      day.foodBills = day.foodBills.filter(b => b.id !== billId); renderFood(); await cloudDeleteFoodBill(dayId, billId);
     }
 
     let editingFoodBill = null;
@@ -2310,7 +2321,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       } else {
         bill = { id: uid("food"), ...fields }; day.foodBills.push(bill);
       }
-      closeFoodModal(); render();
+      closeFoodModal(); renderFood();
       if (movedFromDayId) await cloudDeleteFoodBill(movedFromDayId, bill.id);
       await cloudSaveFoodBill(day, bill);
     }
@@ -2340,7 +2351,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     async function saveSightseeing() {
       const dayId = document.getElementById("formDay").value, name = document.getElementById("formName").value.trim(); if (!dayId || !name) { setStatus("Please select a day and enter a sightseeing name.", "var(--red)"); return }
       const day = data.days.find(d => d.id === dayId); if (!day) return; const costs = {}; PEOPLE.forEach(p => costs[p.id] = Math.max(0, Number(document.getElementById("cost" + capitalize(p.id)).value) || 0));
-      const place = { id: uid("place"), sourceKey: null, original: false, name, costs, visited: false, paidBy: "naren" }; day.places.push(place); closeModal(); render(); await cloudSavePlace(day, place);
+      const place = { id: uid("place"), sourceKey: null, original: false, name, costs, visited: false, paidBy: "naren" }; day.places.push(place); closeModal(); renderSightseeing(); await cloudSavePlace(day, place);
     }
     async function addDay() {
       const name = await customPrompt("Enter the new day name:", `Day ${data.days.length + 1}`); if (name === null) return; const cleaned = name.trim(); if (!cleaned) { setStatus("Day name cannot be empty.", "var(--red)"); return }
@@ -2378,7 +2389,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
         PEOPLE.forEach(p => place.costs[p.id] = original ? Number(original[p.id] || 0) : 0);
         place.paidBy = "naren";
       }));
-      render(); await cloudSaveAllPlaces(); setStatus("Payment data has been reset successfully.", "var(--green)");
+      renderSightseeing(); await cloudSaveAllPlaces(); setStatus("Payment data has been reset successfully.", "var(--green)");
     }
     function closeModal() {
       const backdrop = document.getElementById("sightseeingFormBackdrop"), wasOpen = backdrop.classList.contains("open");
