@@ -783,12 +783,18 @@
       display: none;
       align-items: center;
       justify-content: center;
+      overflow-y: auto;
       padding: 15px;
+      padding-bottom: max(15px, env(safe-area-inset-bottom));
       z-index: 100
     }
 
     .modal-backdrop.open {
       display: flex
+    }
+
+    .modal-backdrop .modal-box {
+      margin: auto
     }
 
     .modal-box {
@@ -1194,6 +1200,10 @@
 
       .mobile-places {
         display: block
+      }
+
+      #foodDaysContainer {
+        padding-bottom: 90px
       }
 
       .mobile-day-total {
@@ -1704,6 +1714,7 @@
       render();
     }
     function switchTab(tab) {
+      if (activeTab !== tab) { closeModal(); closeFoodModal() }
       activeTab = tab;
       document.getElementById("sightseeingView").style.display = tab === "sightseeing" ? "" : "none";
       document.getElementById("foodView").style.display = tab === "food" ? "" : "none";
