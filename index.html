@@ -11,12 +11,30 @@
 </head>
 
 <body>
-  <div class="top-loader" id="topLoader"></div>
   <div class="sync-overlay" id="syncOverlay">
     <div class="sync-overlay-circle"></div>
   </div>
-  <div class="status-toast" id="statusToast"><span class="status-dot" id="statusDot"></span><span class="spinner"
-      id="syncSpinner"></span><span id="statusToastText"></span></div>
+  <div class="status-toast" id="statusToast"><span class="status-dot" id="statusDot"></span><span
+      id="statusToastText"></span></div>
+
+  <div class="landing-screen" id="landingScreen">
+    <div class="landing-content">
+      <div class="landing-brand">🏰 Trip Tracker</div>
+      <h1 class="landing-title">What would you like to view?</h1>
+      <div class="landing-cards">
+        <button type="button" class="landing-card" onclick="chooseLandingView('sightseeing')">
+          <span class="landing-card-icon">🏰</span>
+          <span class="landing-card-title">Sightseeing</span>
+        </button>
+        <button type="button" class="landing-card" onclick="chooseLandingView('food')">
+          <span class="landing-card-icon">🍽️</span>
+          <span class="landing-card-title">Food Bill</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-shell" id="appShell">
   <nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
     <div class="container-fluid">
       <div class="navbar-top-row">
@@ -33,23 +51,23 @@
       </div>
       <div class="collapse navbar-collapse" id="appNavMenu">
         <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="#" onclick="openAddSightseeing();return false">Add
-              Sightseeing</a></li>
+          <li class="nav-item" id="navAddSightseeingItem"><a class="nav-link" href="#"
+              onclick="openAddSightseeing();return false">Add Sightseeing</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="addDay();return false">Add Day</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="refreshFromCloud();return false">Refresh</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="viewGoogleSheet();return false">View Google
               Sheet</a></li>
           <li class="nav-item"><a class="nav-link" href="#" onclick="shareGoogleSheet();return false">Share Sheet
               Link</a></li>
-          <li class="nav-item"><a class="nav-link text-danger" href="#" onclick="resetTrip();return false">Reset
-              Trip</a></li>
+          <li class="nav-item" id="navResetTripItem"><a class="nav-link text-danger" href="#"
+              onclick="resetTrip();return false">Reset Trip</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
   <main class="container">
-    <div class="view-tabs-row">
+    <div class="view-tabs-row" id="mainViewTabsRow">
       <div class="view-tabs">
         <button type="button" class="view-tab active" id="tabBtnSightseeing" onclick="switchTab('sightseeing')">🏰
           Sightseeing</button>
@@ -58,161 +76,189 @@
     </div>
 
     <div id="sightseeingView">
-      <section class="summary-grid">
-        <div class="card total-card">
-          <div class="label">💰 Total Trip Sightseeing Cost</div>
-          <div class="value" id="overallTotal">₹0</div>
+      <div class="view-tabs-row">
+        <div class="view-tabs">
+          <button type="button" class="view-tab active" id="ssTabEntries"
+            onclick="switchSightseeingPage('entries')">📋 Entries</button>
+          <button type="button" class="view-tab" id="ssTabDashboard" onclick="switchSightseeingPage('dashboard')">📊
+            Dashboard</button>
         </div>
-        <div class="card">
-          <div class="label">📍 Locations</div>
-          <div class="value" id="locationCount">0</div>
-        </div>
-        <div class="card">
-          <div class="label">✅ Visited</div>
-          <div class="value" id="visitedCount">0</div>
-        </div>
-        <div class="card">
-          <div class="label">👤 Average / Person</div>
-          <div class="value" id="averagePersonCost">₹0</div>
-        </div>
-      </section>
-
-      <div class="toolbar">
-        <input id="searchInput" type="search" placeholder="Search sightseeing..." oninput="renderSightseeing()">
-        <select id="dayFilter" onchange="renderSightseeing()">
-          <option value="all">All Days</option>
-        </select>
-        <select id="visitedFilter" onchange="renderSightseeing()">
-          <option value="all">All Status</option>
-          <option value="visited">Visited</option>
-          <option value="notVisited">Not Visited</option>
-        </select>
       </div>
 
-      <button type="button" class="fab-add-bill" id="sightseeingFab" onclick="openAddSightseeing()"
-        title="Add Sightseeing" aria-label="Add Sightseeing">+</button>
-
-      <div id="daysContainer"></div>
-
-      <details class="detail-section">
-        <summary><span class="ds-icon">👥</span> Person-wise Totals</summary>
-        <div class="ds-body">
-          <section class="person-grid" id="personTotals"></section>
+      <div id="sightseeingEntriesPage">
+        <div class="toolbar">
+          <input id="searchInput" type="search" placeholder="Search sightseeing..." oninput="renderSightseeing()">
+          <select id="dayFilter" onchange="renderSightseeing()">
+            <option value="all">All Days</option>
+          </select>
+          <select id="visitedFilter" onchange="renderSightseeing()">
+            <option value="all">All Status</option>
+            <option value="visited">Visited</option>
+            <option value="notVisited">Not Visited</option>
+          </select>
         </div>
-      </details>
 
-      <details class="detail-section">
-        <summary><span class="ds-icon">💰</span> Payment Summary</summary>
-        <div class="ds-body">
-          <div class="table-wrap">
-            <table class="payment-table">
-              <thead>
-                <tr>
-                  <th>Person</th>
-                  <th>Total Paid</th>
-                </tr>
-              </thead>
-              <tbody id="paymentSummary"></tbody>
-            </table>
+        <button type="button" class="fab-add-bill" id="sightseeingFab" onclick="openAddSightseeing()"
+          title="Add Sightseeing" aria-label="Add Sightseeing">+</button>
+
+        <div id="daysContainer"></div>
+      </div>
+
+      <div id="sightseeingDashboardPage" style="display:none">
+        <div class="dashboard-heading">Overview</div>
+        <section class="summary-grid">
+          <div class="card total-card">
+            <div class="label">💰 Total Trip Sightseeing Cost</div>
+            <div class="value" id="overallTotal">₹0</div>
           </div>
-        </div>
-      </details>
-
-      <details class="detail-section">
-        <summary><span class="ds-icon">🧮</span> Settlement</summary>
-        <div class="ds-body">
-          <div class="table-wrap">
-            <table class="settlement-table">
-              <thead>
-                <tr>
-                  <th>Family / Person</th>
-                  <th>Paid</th>
-                  <th>Share</th>
-                  <th>Balance</th>
-                </tr>
-              </thead>
-              <tbody id="settlementSummary"></tbody>
-            </table>
+          <div class="card">
+            <div class="label">📍 Locations</div>
+            <div class="value" id="locationCount">0</div>
           </div>
-          <div class="status-note">Settlement groups Rahul and Dhara (with Dugu1 &amp; Dugu2's costs) as one family
-            unit.
-            The children only appear individually in the sightseeing ticket cost breakdown.</div>
+          <div class="card">
+            <div class="label">✅ Visited</div>
+            <div class="value" id="visitedCount">0</div>
+          </div>
+          <div class="card">
+            <div class="label">👤 Average / Person</div>
+            <div class="value" id="averagePersonCost">₹0</div>
+          </div>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="dashboard-card dashboard-card-wide">
+            <div class="dashboard-card-header"><span class="dashboard-card-icon">👥</span><h3>Person-wise Totals</h3>
+            </div>
+            <section class="person-grid" id="personTotals"></section>
+          </section>
+
+          <section class="dashboard-card">
+            <div class="dashboard-card-header"><span class="dashboard-card-icon">💰</span><h3>Payment Summary</h3>
+            </div>
+            <div class="table-wrap">
+              <table class="payment-table">
+                <thead>
+                  <tr>
+                    <th>Person</th>
+                    <th>Total Paid</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentSummary"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="dashboard-card">
+            <div class="dashboard-card-header"><span class="dashboard-card-icon">🧮</span><h3>Settlement</h3></div>
+            <div class="table-wrap">
+              <table class="settlement-table">
+                <thead>
+                  <tr>
+                    <th>Family / Person</th>
+                    <th>Paid</th>
+                    <th>Share</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="settlementSummary"></tbody>
+              </table>
+            </div>
+            <div class="status-note">Settlement groups Rahul and Dhara (with Dugu1 &amp; Dugu2's costs) as one family
+              unit.
+              The children only appear individually in the sightseeing ticket cost breakdown.</div>
+          </section>
         </div>
-      </details>
+      </div>
     </div>
 
     <div id="foodView" style="display:none">
       <div class="food-tracker-heading">🍽️ Food Bill Tracker <span>· managed by Parul</span></div>
-      <button type="button" class="fab-add-bill" id="foodFab" onclick="openAddFoodBill()" title="Add Food Bill"
-        aria-label="Add Food Bill">+</button>
-      <section class="summary-grid">
-        <div class="card total-card">
-          <div class="label">💰 Total Food Bill Cost</div>
-          <div class="value" id="foodOverallTotal">₹0</div>
-        </div>
-        <div class="card">
-          <div class="label">🧾 Food Bills</div>
-          <div class="value" id="foodBillCount">0</div>
-        </div>
-        <div class="card">
-          <div class="label">📊 Average / Bill</div>
-          <div class="value" id="foodAverageBill">₹0</div>
-        </div>
-      </section>
 
-      <div class="toolbar">
-        <input id="foodSearchInput" type="search" placeholder="Search restaurant, food, notes..."
-          oninput="renderFood()">
-        <select id="foodDayFilter" onchange="renderFood()">
-          <option value="all">All Days</option>
-        </select>
+      <div class="view-tabs-row">
+        <div class="view-tabs">
+          <button type="button" class="view-tab active" id="foodTabEntries" onclick="switchFoodPage('entries')">📋
+            Entries</button>
+          <button type="button" class="view-tab" id="foodTabDashboard" onclick="switchFoodPage('dashboard')">📊
+            Dashboard</button>
+        </div>
       </div>
 
-      <div id="foodDaysContainer"></div>
+      <div id="foodEntriesPage">
+        <button type="button" class="fab-add-bill" id="foodFab" onclick="openAddFoodBill()" title="Add Food Bill"
+          aria-label="Add Food Bill">+</button>
 
-      <details class="detail-section">
-        <summary><span class="ds-icon">💰</span> Payment Summary</summary>
-        <div class="ds-body">
-          <div class="table-wrap">
-            <table class="payment-table">
-              <thead>
-                <tr>
-                  <th>Person</th>
-                  <th>Total Paid</th>
-                </tr>
-              </thead>
-              <tbody id="foodPaymentSummary"></tbody>
-            </table>
-          </div>
+        <div class="toolbar">
+          <input id="foodSearchInput" type="search" placeholder="Search restaurant, food, notes..."
+            oninput="renderFood()">
+          <select id="foodDayFilter" onchange="renderFood()">
+            <option value="all">All Days</option>
+          </select>
         </div>
-      </details>
 
-      <details class="detail-section">
-        <summary><span class="ds-icon">🧮</span> Settlement</summary>
-        <div class="ds-body">
-          <div class="table-wrap">
-            <table class="settlement-table">
-              <thead>
-                <tr>
-                  <th>Family / Person</th>
-                  <th>Paid</th>
-                  <th>Share</th>
-                  <th>Balance</th>
-                </tr>
-              </thead>
-              <tbody id="foodSettlementSummary"></tbody>
-            </table>
+        <div id="foodDaysContainer"></div>
+      </div>
+
+      <div id="foodDashboardPage" style="display:none">
+        <div class="dashboard-heading">Overview</div>
+        <section class="summary-grid">
+          <div class="card total-card">
+            <div class="label">💰 Total Food Bill Cost</div>
+            <div class="value" id="foodOverallTotal">₹0</div>
           </div>
-          <div class="status-note">Settlement groups Rahul and Dhara (with Dugu1 &amp; Dugu2's costs) as one family
-            unit.
-            The children only appear individually in the sightseeing ticket cost breakdown.</div>
+          <div class="card">
+            <div class="label">🧾 Food Bills</div>
+            <div class="value" id="foodBillCount">0</div>
+          </div>
+          <div class="card">
+            <div class="label">📊 Average / Bill</div>
+            <div class="value" id="foodAverageBill">₹0</div>
+          </div>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="dashboard-card">
+            <div class="dashboard-card-header"><span class="dashboard-card-icon">💰</span><h3>Payment Summary</h3>
+            </div>
+            <div class="table-wrap">
+              <table class="payment-table">
+                <thead>
+                  <tr>
+                    <th>Person</th>
+                    <th>Total Paid</th>
+                  </tr>
+                </thead>
+                <tbody id="foodPaymentSummary"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="dashboard-card">
+            <div class="dashboard-card-header"><span class="dashboard-card-icon">🧮</span><h3>Settlement</h3></div>
+            <div class="table-wrap">
+              <table class="settlement-table">
+                <thead>
+                  <tr>
+                    <th>Family / Person</th>
+                    <th>Paid</th>
+                    <th>Share</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="foodSettlementSummary"></tbody>
+              </table>
+            </div>
+            <div class="status-note">Settlement groups Rahul and Dhara (with Dugu1 &amp; Dugu2's costs) as one family
+              unit.
+              The children only appear individually in the sightseeing ticket cost breakdown.</div>
+          </section>
         </div>
-      </details>
+      </div>
     </div>
   </main>
 
   <footer class="footer">Rajasthan Trip Tracker · Online Google Sheets storage · Changes sync automatically<br>Designed,
     developed &amp; maintained by Narendra Makadiya</footer>
+  </div>
 
   <div class="modal-backdrop" id="sightseeingFormBackdrop">
     <div class="modal-box">

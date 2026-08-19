@@ -88,6 +88,25 @@
       try { localStorage.setItem("rtt_activeTab", tab) } catch (e) { }
     }
 
+    // Each view (Sightseeing / Food Bill) has its own two sub-pages: the
+    // Entries list (what you add/edit/filter) and the Dashboard (aggregate
+    // totals, payment summary, settlement) — kept apart so entering data and
+    // reviewing totals don't compete for the same screen.
+    function switchSightseeingPage(page) {
+      const isDashboard = page === "dashboard";
+      document.getElementById("sightseeingEntriesPage").style.display = isDashboard ? "none" : "";
+      document.getElementById("sightseeingDashboardPage").style.display = isDashboard ? "" : "none";
+      document.getElementById("ssTabEntries").classList.toggle("active", !isDashboard);
+      document.getElementById("ssTabDashboard").classList.toggle("active", isDashboard);
+    }
+    function switchFoodPage(page) {
+      const isDashboard = page === "dashboard";
+      document.getElementById("foodEntriesPage").style.display = isDashboard ? "none" : "";
+      document.getElementById("foodDashboardPage").style.display = isDashboard ? "" : "none";
+      document.getElementById("foodTabEntries").classList.toggle("active", !isDashboard);
+      document.getElementById("foodTabDashboard").classList.toggle("active", isDashboard);
+    }
+
     const TRIP_START_DATE = new Date(2026, 7, 29); // 29 Aug 2026 = Day 1
     const TRIP_DAY_COUNT = 5; // 29 Aug - 2 Sept 2026
 
@@ -255,8 +274,6 @@
     function setBusy(active) {
       busyCount = Math.max(0, busyCount + (active ? 1 : -1));
       const busy = busyCount > 0;
-      const loader = document.getElementById("topLoader"); if (loader) loader.classList.toggle("active", busy);
-      const spinner = document.getElementById("syncSpinner"); if (spinner) spinner.classList.toggle("active", busy);
       const overlay = document.getElementById("syncOverlay"); if (overlay) overlay.classList.toggle("active", busy);
     }
 
@@ -785,11 +802,20 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     document.getElementById("appNavMenu").addEventListener("show.bs.collapse", closeThemeMenu);
     populateThemeMenu();
 
-    if (window.innerWidth > 700) document.querySelectorAll(".detail-section").forEach(d => d.open = true);
-
-    let savedTab = "sightseeing";
-    try { savedTab = localStorage.getItem("rtt_activeTab") || "sightseeing" } catch (e) { }
-    switchTab(savedTab === "food" ? "food" : "sightseeing");
+    function chooseLandingView(tab) {
+      const view = tab === "food" ? "food" : "sightseeing";
+      document.getElementById("landingScreen").style.display = "none";
+      document.getElementById("appShell").classList.add("app-shell-visible");
+      switchTab(view);
+      // Only one view was chosen on the landing page, so don't offer a way
+      // to switch to the other one from inside the app.
+      document.getElementById("mainViewTabsRow").style.display = "none";
+      if (view === "food") {
+        document.getElementById("navAddSightseeingItem").style.display = "none";
+        document.getElementById("navResetTripItem").style.display = "none";
+      }
+    }
+    switchTab("sightseeing");
 
     if (API_URL.includes("PASTE_YOUR")) {
       data = makeInitialData(); normalizeData(); render(); setStatus("Add Apps Script URL", "var(--orange)");
