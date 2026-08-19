@@ -378,18 +378,8 @@
       box-shadow: 0 0 0 3px rgba(18, 108, 191, .15)
     }
 
-    .inline-form-panel {
-      display: none;
-      background: #fff;
-      border: 1px solid var(--blue2);
-      border-radius: 12px;
-      box-shadow: 0 4px 18px rgba(16, 24, 40, .12);
-      margin-bottom: 18px;
-      overflow: hidden
-    }
-
-    .inline-form-panel.open {
-      display: block
+    .sheet-handle {
+      display: none
     }
 
     .day-card {
@@ -831,12 +821,6 @@
       padding: 18px
     }
 
-    .inline-form-panel .modal-body {
-      overflow: visible;
-      -webkit-overflow-scrolling: auto;
-      overscroll-behavior: auto
-    }
-
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1202,7 +1186,8 @@
         display: block
       }
 
-      #foodDaysContainer {
+      #foodDaysContainer,
+      #daysContainer {
         padding-bottom: 90px
       }
 
@@ -1271,6 +1256,16 @@
         border-radius: 12px 12px 0 0
       }
 
+      .sheet-handle {
+        display: block;
+        width: 40px;
+        height: 4px;
+        margin: 8px auto 0;
+        border-radius: 2px;
+        background: #d0d5dd;
+        flex-shrink: 0
+      }
+
       .modal-header,
       .modal-body {
         padding: 13px
@@ -1281,12 +1276,12 @@
         gap: 8px
       }
 
-      #sightseeingFormPanel .field:first-child,
-      #sightseeingFormPanel .field:nth-child(2) {
+      #sightseeingFormBackdrop .field:first-child,
+      #sightseeingFormBackdrop .field:nth-child(2) {
         grid-column: 1/-1
       }
 
-      #foodFormPanel .form-grid {
+      #foodFormBackdrop .form-grid {
         grid-template-columns: 1fr
       }
 
@@ -1427,31 +1422,7 @@
         </select>
       </div>
 
-      <section class="inline-form-panel" id="sightseeingFormPanel">
-        <div class="modal-header">
-          <h3>Add Sightseeing</h3><button class="close-btn" onclick="closeModal()">×</button>
-        </div>
-        <div class="modal-body">
-          <form id="sightseeingForm">
-            <div class="form-grid">
-              <div class="field"><label>Day</label><select id="formDay" required></select></div>
-              <div class="field"><label>Sightseeing Name</label><input id="formName" required
-                  placeholder="e.g. Shilpgram"></div>
-              <div class="field"><label>Rahul Cost</label><input id="costRahul" type="number" min="0" value="0"></div>
-              <div class="field"><label>Dhara Cost</label><input id="costDhara" type="number" min="0" value="0"></div>
-              <div class="field"><label>Dugu1 (2Y) Cost</label><input id="costDugu1" type="number" min="0" value="0">
-              </div>
-              <div class="field"><label>Dugu2 (3Y) Cost</label><input id="costDugu2" type="number" min="0" value="0">
-              </div>
-              <div class="field"><label>Naren Cost</label><input id="costNaren" type="number" min="0" value="0"></div>
-              <div class="field"><label>Parul Cost</label><input id="costParul" type="number" min="0" value="0"></div>
-              <div class="field"><label>Prakash Cost</label><input id="costPrakash" type="number" min="0" value="0"></div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary"
-            onclick="saveSightseeing()">Save Sightseeing</button></div>
-      </section>
+      <button type="button" class="fab-add-bill" id="sightseeingFab" onclick="openAddSightseeing()" title="Add Sightseeing" aria-label="Add Sightseeing">+</button>
 
       <div id="daysContainer"></div>
 
@@ -1526,37 +1497,6 @@
         </select>
       </div>
 
-      <section class="inline-form-panel" id="foodFormPanel">
-        <div class="modal-header">
-          <h3 id="foodModalTitle">🍽️ Add Food Bill</h3><button class="close-btn" onclick="closeFoodModal()">×</button>
-        </div>
-        <div class="modal-body">
-          <form id="foodBillForm">
-            <div class="form-grid">
-              <div class="field" style="grid-column:1/-1"><label>Restaurant / Shop</label><input id="foodFormRestaurant" required
-                  placeholder="e.g. Local Dhaba"></div>
-              <select id="foodFormDay" style="display:none"></select>
-              <div class="field"><label>Date</label><input id="foodFormDate" type="date"></div>
-              <div class="field"><label>Food</label><input id="foodFormFood" placeholder="e.g. Thali, Lassi"></div>
-              <div class="field"><label>Category</label>
-                <select id="foodFormCategory">
-                  <option value="breakfast">Breakfast</option>
-                  <option value="lunch" selected>Lunch</option>
-                  <option value="dinner">Dinner</option>
-                  <option value="snacks">Snacks</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div class="field"><label>Amount (₹)</label><input id="foodFormAmount" type="number" min="0" value="0" inputmode="decimal"></div>
-              <div class="field"><label>Paid By</label><select id="foodFormPaidBy"></select></div>
-              <div class="field" style="grid-column:1/-1"><label>Notes</label><input id="foodFormNotes" placeholder="Optional notes"></div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer"><button onclick="closeFoodModal()">Cancel</button><button class="btn-primary"
-            onclick="saveFoodBill()" id="foodFormSaveBtn">Save Food Bill</button></div>
-      </section>
-
       <div id="foodDaysContainer"></div>
 
       <details class="detail-section">
@@ -1600,6 +1540,69 @@
   </main>
 
   <footer class="footer">Rajasthan Trip Tracker · Online Google Sheets storage · Changes sync automatically<br>Designed, developed &amp; maintained by Narendra Makadiya</footer>
+
+  <div class="modal-backdrop" id="sightseeingFormBackdrop">
+    <div class="modal-box">
+      <div class="sheet-handle"></div>
+      <div class="modal-header">
+        <h3>🏰 Add Sightseeing</h3><button class="close-btn" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="sightseeingForm">
+          <div class="form-grid">
+            <div class="field"><label>Day</label><select id="formDay" required></select></div>
+            <div class="field"><label>Sightseeing Name</label><input id="formName" required
+                placeholder="e.g. Shilpgram"></div>
+            <div class="field"><label>Rahul Cost</label><input id="costRahul" type="number" min="0" value="0"></div>
+            <div class="field"><label>Dhara Cost</label><input id="costDhara" type="number" min="0" value="0"></div>
+            <div class="field"><label>Dugu1 (2Y) Cost</label><input id="costDugu1" type="number" min="0" value="0">
+            </div>
+            <div class="field"><label>Dugu2 (3Y) Cost</label><input id="costDugu2" type="number" min="0" value="0">
+            </div>
+            <div class="field"><label>Naren Cost</label><input id="costNaren" type="number" min="0" value="0"></div>
+            <div class="field"><label>Parul Cost</label><input id="costParul" type="number" min="0" value="0"></div>
+            <div class="field"><label>Prakash Cost</label><input id="costPrakash" type="number" min="0" value="0"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"><button onclick="closeModal()">Cancel</button><button class="btn-primary"
+          onclick="saveSightseeing()">Save Sightseeing</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="foodFormBackdrop">
+    <div class="modal-box">
+      <div class="sheet-handle"></div>
+      <div class="modal-header">
+        <h3 id="foodModalTitle">🍽️ Add Food Bill</h3><button class="close-btn" onclick="closeFoodModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="foodBillForm">
+          <div class="form-grid">
+            <div class="field" style="grid-column:1/-1"><label>Restaurant / Shop</label><input id="foodFormRestaurant" required
+                placeholder="e.g. Local Dhaba"></div>
+            <div class="field"><label>Day</label><select id="foodFormDay" onchange="syncFoodFormDateFromDay()" required></select></div>
+            <div class="field"><label>Date</label><input id="foodFormDate" type="date" onchange="syncFoodFormDayFromDate()"></div>
+            <div class="field"><label>Food</label><input id="foodFormFood" placeholder="e.g. Thali, Lassi"></div>
+            <div class="field"><label>Category</label>
+              <select id="foodFormCategory">
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch" selected>Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="snacks">Snacks</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field"><label>Amount (₹)</label><input id="foodFormAmount" type="number" min="0" value="0" inputmode="decimal"></div>
+            <div class="field"><label>Paid By</label><select id="foodFormPaidBy"></select></div>
+            <div class="field" style="grid-column:1/-1"><label>Notes</label><input id="foodFormNotes" placeholder="Optional notes"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"><button onclick="closeFoodModal()">Cancel</button><button class="btn-primary"
+          onclick="saveFoodBill()" id="foodFormSaveBtn">Save Food Bill</button></div>
+    </div>
+  </div>
 
   <div class="modal-backdrop" id="shareModalBackdrop">
     <div class="modal-box" style="width:min(360px,100%)">
@@ -1748,10 +1751,18 @@
     }
     function getDayDateString(dayId) {
       const idx = data.days.findIndex(d => d.id === dayId);
-      if (idx < 0 || idx >= TRIP_DAY_COUNT) return "";
+      if (idx < 0) return "";
       const d = new Date(TRIP_START_DATE); d.setDate(d.getDate() + idx);
       const pad = n => String(n).padStart(2, "0");
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
+    function getDayIdForDateString(dateStr) {
+      if (!dateStr) return null;
+      const [y, m, d] = dateStr.split("-").map(Number);
+      if (!y || !m || !d) return null;
+      const idx = Math.round((new Date(y, m - 1, d) - TRIP_START_DATE) / 86400000);
+      if (idx < 0 || idx >= data.days.length) return null;
+      return data.days[idx] ? data.days[idx].id : null;
     }
     function todayDateString() {
       const d = new Date(), pad = n => String(n).padStart(2, "0");
@@ -1812,6 +1823,23 @@
       });
       data.people = PEOPLE.map(p => ({ ...p }));
       return addedDays;
+    }
+
+    function reconcileFoodBillDays() {
+      const moves = [];
+      data.days.forEach(day => {
+        (day.foodBills || []).forEach(bill => {
+          const correctDayId = bill.date ? getDayIdForDateString(bill.date) : null;
+          if (correctDayId && correctDayId !== day.id) moves.push({ bill, fromDayId: day.id, toDayId: correctDayId });
+        });
+      });
+      moves.forEach(({ bill, fromDayId, toDayId }) => {
+        const fromDay = data.days.find(d => d.id === fromDayId), toDay = data.days.find(d => d.id === toDayId);
+        if (!fromDay || !toDay) return;
+        fromDay.foodBills = fromDay.foodBills.filter(b => b.id !== bill.id);
+        toDay.foodBills.push(bill);
+      });
+      return moves;
     }
 
     let statusHideTimer = null;
@@ -1968,8 +1996,17 @@
         if (result.days && result.days.length) {
           data = { version: DATA_VERSION, people: PEOPLE.map(p => ({ ...p })), days: result.days };
           const addedDays = normalizeData();
+          const movedBills = reconcileFoodBillDays();
           setStatus("Cloud synced", "var(--green)");
           if (addedDays.length) { loadingCloud = false; render(); for (const day of addedDays) await cloudSaveDay(day); }
+          if (movedBills.length) {
+            loadingCloud = false; render();
+            for (const { bill, fromDayId, toDayId } of movedBills) {
+              await cloudDeleteFoodBill(fromDayId, bill.id);
+              const toDay = data.days.find(d => d.id === toDayId);
+              await cloudSaveFoodBill(toDay, bill);
+            }
+          }
         } else {
           data = makeInitialData(); normalizeData();
           loadingCloud = false; render();
@@ -2210,9 +2247,9 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<option value="${p.id}" ${p.id === "parul" ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
       document.getElementById("foodFormDay").value = getTodayDayId() || (data.days[0] ? data.days[0].id : "");
       document.getElementById("foodFormDate").value = todayDateString();
-      document.getElementById("foodFormPanel").classList.add("open");
+      document.getElementById("foodFormBackdrop").classList.add("open");
       document.getElementById("foodFab").style.display = "none";
-      document.getElementById("foodFormPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+      lockBodyScroll();
     }
     function openEditFoodBill(dayId, billId) {
       const day = data.days.find(d => d.id === dayId), bill = day?.foodBills.find(b => b.id === billId); if (!bill) return;
@@ -2221,7 +2258,7 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       document.getElementById("foodFormSaveBtn").textContent = "Update Food Bill";
       populateFoodDayForm();
       document.getElementById("foodFormDay").value = dayId;
-      document.getElementById("foodFormDay").disabled = true;
+      document.getElementById("foodFormDay").disabled = false;
       document.getElementById("foodFormDate").value = bill.date || getDayDateString(dayId);
       document.getElementById("foodFormRestaurant").value = bill.restaurantShop;
       document.getElementById("foodFormFood").value = bill.food || "";
@@ -2229,13 +2266,21 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       document.getElementById("foodFormCategory").value = bill.category;
       document.getElementById("foodFormNotes").value = bill.notes || "";
       document.getElementById("foodFormPaidBy").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<option value="${p.id}" ${p.id === bill.paidBy ? "selected" : ""}>${escapeHtml(p.name)}</option>`).join("");
-      document.getElementById("foodFormPanel").classList.add("open");
+      document.getElementById("foodFormBackdrop").classList.add("open");
       document.getElementById("foodFab").style.display = "none";
-      document.getElementById("foodFormPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+      lockBodyScroll();
     }
     function populateFoodDayForm() {
       const select = document.getElementById("foodFormDay");
       select.innerHTML = data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("");
+    }
+    function syncFoodFormDateFromDay() {
+      const dayId = document.getElementById("foodFormDay").value, dateStr = getDayDateString(dayId);
+      if (dateStr) document.getElementById("foodFormDate").value = dateStr;
+    }
+    function syncFoodFormDayFromDate() {
+      const dayId = getDayIdForDateString(document.getElementById("foodFormDate").value);
+      if (dayId) document.getElementById("foodFormDay").value = dayId;
     }
     async function saveFoodBill() {
       const dayId = document.getElementById("foodFormDay").value, restaurantShop = document.getElementById("foodFormRestaurant").value.trim();
@@ -2252,16 +2297,30 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
         notes: document.getElementById("foodFormNotes").value.trim()
       };
       if (!day.foodBills) day.foodBills = [];
-      let bill;
+      let bill, movedFromDayId = null;
       if (editingFoodBill) {
-        bill = day.foodBills.find(b => b.id === editingFoodBill.billId); if (!bill) return;
+        const oldDay = data.days.find(d => d.id === editingFoodBill.dayId);
+        bill = oldDay?.foodBills.find(b => b.id === editingFoodBill.billId); if (!bill) return;
         Object.assign(bill, fields);
+        if (oldDay.id !== dayId) {
+          oldDay.foodBills = oldDay.foodBills.filter(b => b.id !== bill.id);
+          day.foodBills.push(bill);
+          movedFromDayId = oldDay.id;
+        }
       } else {
         bill = { id: uid("food"), ...fields }; day.foodBills.push(bill);
       }
-      closeFoodModal(); render(); await cloudSaveFoodBill(day, bill);
+      closeFoodModal(); render();
+      if (movedFromDayId) await cloudDeleteFoodBill(movedFromDayId, bill.id);
+      await cloudSaveFoodBill(day, bill);
     }
-    function closeFoodModal() { document.getElementById("foodFormPanel").classList.remove("open"); document.getElementById("foodFab").style.display = ""; editingFoodBill = null }
+    function closeFoodModal() {
+      const backdrop = document.getElementById("foodFormBackdrop"), wasOpen = backdrop.classList.contains("open");
+      backdrop.classList.remove("open");
+      document.getElementById("foodFab").style.display = "";
+      editingFoodBill = null;
+      if (wasOpen) unlockBodyScroll();
+    }
 
     function renderFoodPayments(totals) { document.getElementById("foodPaymentSummary").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
     function renderFoodSettlement(totals) {
@@ -2273,8 +2332,9 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       if (activeTab !== "sightseeing") switchTab("sightseeing");
       populateDayForm(); document.getElementById("formName").value = "";
       PEOPLE.forEach(p => document.getElementById("cost" + capitalize(p.id)).value = 0);
-      document.getElementById("sightseeingFormPanel").classList.add("open");
-      document.getElementById("sightseeingFormPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("sightseeingFormBackdrop").classList.add("open");
+      document.getElementById("sightseeingFab").style.display = "none";
+      lockBodyScroll();
     }
     function populateDayForm() { document.getElementById("formDay").innerHTML = data.days.map(d => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.name)}</option>`).join("") }
     async function saveSightseeing() {
@@ -2320,9 +2380,16 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       }));
       render(); await cloudSaveAllPlaces(); setStatus("Payment data has been reset successfully.", "var(--green)");
     }
-    function closeModal() { document.getElementById("sightseeingFormPanel").classList.remove("open") }
+    function closeModal() {
+      const backdrop = document.getElementById("sightseeingFormBackdrop"), wasOpen = backdrop.classList.contains("open");
+      backdrop.classList.remove("open");
+      document.getElementById("sightseeingFab").style.display = "";
+      if (wasOpen) unlockBodyScroll();
+    }
     document.getElementById("shareModalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeShareModal() });
     document.getElementById("confirmModalBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) resolveConfirmModal(false) });
+    document.getElementById("sightseeingFormBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal() });
+    document.getElementById("foodFormBackdrop").addEventListener("click", e => { if (e.target === e.currentTarget) closeFoodModal() });
     document.addEventListener("keydown", e => { if (e.key === "Escape") { closeModal(); closeFoodModal(); closeShareModal(); closeThemeMenu(); resolveConfirmModal(false) } });
 
     function populateThemeMenu() {
