@@ -412,6 +412,7 @@
     async function cloudSavePlace(day, place) {
       try { await apiCall("savePlace", { dayId: day.id, dayName: day.name, place }); setStatus("Saved online", "var(--green)") }
       catch (e) { console.error(e); setStatus("Changed locally; cloud save failed", "var(--red)") }
+      notifyPlaceCostWhatsApp(day, place);
     }
     async function cloudDeletePlace(dayId, placeId) {
       try { await apiCall("deletePlace", { dayId, placeId }); setStatus("Deleted online", "var(--green)") }
@@ -424,6 +425,45 @@
     async function cloudSaveFoodBill(day, bill) {
       try { await apiCall("saveFoodBill", { dayId: day.id, dayName: day.name, bill }); setStatus("Saved online", "var(--green)") }
       catch (e) { console.error(e); setStatus("Changed locally; cloud save failed", "var(--red)") }
+      notifyFoodBillWhatsApp(day, bill);
+    }
+
+    /* =========================================================
+       WHATSAPP NOTIFICATIONS (Twilio)
+       Fires on food bill and sightseeing cost saves. Config/credentials
+       live in twilio-config.js (gitignored, loaded before this file).
+       Only recipients with enabled:true actually receive a message.
+       ========================================================= */
+    const FOOD_SPLIT_IDS = ["rahul", "dhara", "naren", "parul", "prakash"];
+    async function sendTwilioWhatsApp(toPhone, body) {
+      try {
+        const url = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_CONFIG.accountSid}/Messages.json`;
+        const params = new URLSearchParams({ To: `whatsapp:${toPhone}`, From: TWILIO_CONFIG.whatsappFrom, Body: body });
+        await fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: "Basic " + btoa(`${TWILIO_CONFIG.accountSid}:${TWILIO_CONFIG.authToken}`),
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: params.toString()
+        });
+      } catch (e) { console.warn("WhatsApp notify failed (Twilio's API may block direct browser calls via CORS):", e) }
+    }
+    function enabledWhatsAppRecipients() {
+      return (typeof TWILIO_CONFIG !== "undefined" && TWILIO_CONFIG.recipients || []).filter(r => r.enabled);
+    }
+    async function notifyFoodBillWhatsApp(day, bill) {
+      const recipients = enabledWhatsAppRecipients(); if (!recipients.length) return;
+      const payerName = PEOPLE.find(p => p.id === bill.paidBy)?.name || bill.paidBy;
+      const share = (Number(bill.amount) || 0) / FOOD_SPLIT_IDS.length;
+      const body = `Food bill (${day.name}): ${bill.restaurantShop}\nAmount: Rs.${bill.amount}\nPaid by: ${payerName}\nDate: ${bill.date}\nYour share: Rs.${share.toFixed(0)}${bill.notes ? `\nNotes: ${bill.notes}` : ""}`;
+      await Promise.all(recipients.map(r => sendTwilioWhatsApp(r.phone, body)));
+    }
+    async function notifyPlaceCostWhatsApp(day, place) {
+      const recipients = enabledWhatsAppRecipients(); if (!recipients.length) return;
+      const total = getPlaceTotal(place);
+      const body = `Sightseeing cost updated: ${place.name} (${day.name})\nTotal: Rs.${total}`;
+      await Promise.all(recipients.map(r => sendTwilioWhatsApp(r.phone, body)));
     }
     async function cloudDeleteFoodBill(dayId, billId) {
       try { await apiCall("deleteFoodBill", { dayId, billId }); setStatus("Deleted online", "var(--green)") }
