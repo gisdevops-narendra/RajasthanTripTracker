@@ -714,8 +714,9 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
 
     function renderFoodPayments(totals) { document.getElementById("foodPaymentSummary").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
     function renderFoodSettlement(totals) {
-      const family = ["rahul", "dhara", "dugu1", "dugu2"], individual = ["naren", "parul", "prakash"], familyPaid = family.reduce((s, id) => s + (totals.payments[id] || 0), 0), share = totals.overall / 4;
-      let rows = renderSettlementRow("Rahul + Dhara", familyPaid, share); individual.forEach(id => { const p = PEOPLE.find(x => x.id === id); rows += renderSettlementRow(p.name, totals.payments[id] || 0, share) }); document.getElementById("foodSettlementSummary").innerHTML = rows;
+      const people = ["rahul", "dhara", "naren", "parul", "prakash"], share = totals.overall / people.length;
+      let rows = people.map(id => { const p = PEOPLE.find(x => x.id === id); return renderSettlementRow(p.name, totals.payments[id] || 0, share) }).join("");
+      document.getElementById("foodSettlementSummary").innerHTML = rows;
     }
 
     function openAddSightseeing() {
@@ -737,19 +738,10 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
       const day = { id: uid("day"), name: cleaned, places: [] }; data.days.push(day); render(); await cloudSaveDay(day);
     }
 
-    function getDisplayPersonTotal(totals, personId) {
-      let total = totals.people[personId] || 0;
-      PEOPLE.forEach(p => { if (p.childOf && p.childOf.includes(personId)) total += (totals.people[p.id] || 0) / p.childOf.length });
-      return total;
-    }
-    function renderPersonTotals(totals) { document.getElementById("personTotals").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<div class="card person-card"><div class="label">${escapeHtml(p.name)}</div><div class="value">${currency(getDisplayPersonTotal(totals, p.id))}</div></div>`).join("") }
-    function renderPayments(totals) { document.getElementById("paymentSummary").innerHTML = PEOPLE.filter(p => !p.childOf).map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
+    function renderPersonTotals(totals) { document.getElementById("personTotals").innerHTML = PEOPLE.map(p => `<div class="card person-card"><div class="label">${escapeHtml(p.name)}</div><div class="value">${currency(totals.people[p.id] || 0)}</div></div>`).join("") }
+    function renderPayments(totals) { document.getElementById("paymentSummary").innerHTML = PEOPLE.map(p => `<tr><td>${escapeHtml(p.name)}</td><td>${currency(totals.payments[p.id] || 0)}</td></tr>`).join("") }
     function renderSettlement(totals) {
-      const family = ["rahul", "dhara", "dugu1", "dugu2"], individual = ["naren", "parul", "prakash"];
-      const familyPaid = family.reduce((s, id) => s + (totals.payments[id] || 0), 0);
-      const familyShare = family.reduce((s, id) => s + (totals.people[id] || 0), 0);
-      let rows = renderSettlementRow("Rahul + Dhara", familyPaid, familyShare);
-      individual.forEach(id => { const p = PEOPLE.find(x => x.id === id); rows += renderSettlementRow(p.name, totals.payments[id] || 0, totals.people[id] || 0) });
+      let rows = PEOPLE.map(p => renderSettlementRow(p.name, totals.payments[p.id] || 0, totals.people[p.id] || 0)).join("");
       document.getElementById("settlementSummary").innerHTML = rows;
     }
     function renderSettlementRow(name, paid, share) {

@@ -50,7 +50,11 @@ There is **no localStorage persistence of trip data** — only UI prefs (`rtt_th
 `TRIP_START_DATE` and `TRIP_DAY_COUNT` (`script.js`) anchor day IDs (`day-1`, `day-2`, ...) to real calendar dates, used to auto-select "today's" day in filters (`getAutoDayId`, `getTodayDayId`) and to auto-assign food bills to the correct day when their date is edited (`reconcileFoodBillDays`, `getDayIdForDateString`). Update `TRIP_START_DATE`/`TRIP_DAY_COUNT` if the trip dates change.
 
 ### Settlement/family grouping
-Rahul, Dhara, and their two kids (`dugu1`, `dugu2`) are grouped as one settlement unit ("Rahul + Dhara") in both the sightseeing and food settlement tables (`renderSettlement`/`renderFoodSettlement` in `script.js`) — the kids' costs roll up into the parents' share via `childOf` on their `PEOPLE` entries and `getDisplayPersonTotal()`. The other four travelers (`naren`, `parul`, `prakash`, and any future addition without a `family` grouping) settle individually. This grouping is hardcoded by person ID (`["rahul","dhara","dugu1","dugu2"]`) in the render functions, not derived generically from `PEOPLE.family`.
+Neither settlement table groups Rahul/Dhara/kids into a combined "family" unit anymore — both settle all `PEOPLE` individually:
+- **Sightseeing** (`renderSettlement`, `renderPersonTotals`, `renderPayments`): all 7 travelers — including `dugu1`/`dugu2` — get their own row/card, using their actual per-place ticket cost from `costs[personId]` (`totals.people[id]`) as their share. Ticket-cost splitting was already per-person in the data model (`PEOPLE.forEach` when building `costs`); only the display/settlement layer used to roll the kids' shares into their parents via `childOf`, which it no longer does.
+- **Food** (`renderFoodSettlement`): the bill total is split equally 5 ways between Rahul, Dhara, Naren, Parul, and Prakash.
+
+`childOf` on `dugu1`/`dugu2` is still used to exclude them from the food bill's `paidBy` dropdown/summary (`renderFoodPayments`, `foodFormPaidBy`) — kids never pay for food bills or select who pays — and from sightseeing `paidBy` in general (which, for sightseeing, has no editor UI at all; `place.paidBy` is always `"naren"` by default).
 
 ### `DATA_VERSION`
 `DATA_VERSION` (`script.js`) exists for future migration guarding but isn't currently branched on beyond being stamped onto `data`.
