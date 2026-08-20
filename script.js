@@ -483,7 +483,6 @@
       document.getElementById("locationCount").textContent = totals.locations;
       document.getElementById("visitedCount").textContent = totals.visited + " / " + totals.locations;
       document.getElementById("averagePersonCost").textContent = currency(totals.overall / PEOPLE.length);
-      document.getElementById("averageSightseeingBill").textContent = currency(totals.locations ? totals.overall / totals.locations : 0);
       renderDayFilter(); renderDays(); renderPersonTotals(totals); renderPayments(totals); renderSettlement(totals);
     }
 
