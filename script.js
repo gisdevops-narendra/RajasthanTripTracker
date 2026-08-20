@@ -491,7 +491,7 @@
       const foodTotals = calculateFoodTotals();
       document.getElementById("foodOverallTotal").textContent = currency(foodTotals.overall);
       document.getElementById("foodBillCount").textContent = foodTotals.count;
-      document.getElementById("foodAverageBill").textContent = currency(foodTotals.count ? foodTotals.overall / foodTotals.count : 0);
+      document.getElementById("foodAverageBill").textContent = currency(foodTotals.overall / 5);
       renderFoodDayFilter(); renderFoodDays(); renderFoodPayments(foodTotals); renderFoodSettlement(foodTotals);
     }
     function renderDayFilter() {
