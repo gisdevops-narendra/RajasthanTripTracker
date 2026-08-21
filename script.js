@@ -795,6 +795,10 @@ ${bill.notes ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px"
     document.getElementById("appNavMenu").addEventListener("show.bs.collapse", closeThemeMenu);
     populateThemeMenu();
 
+    function openUdaipurChittorgarhApp() {
+      window.open("https://gisdevops-narendra.github.io/udaipur-chittorgarh/", "_blank", "noopener");
+    }
+
     function chooseLandingView(tab) {
       const view = tab === "food" ? "food" : "sightseeing";
       document.getElementById("landingScreen").style.display = "none";
